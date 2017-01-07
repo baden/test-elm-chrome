@@ -7,6 +7,9 @@ module Main exposing (..)
 import Html exposing (Html, div, button, text, select, option)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Serial exposing (loadTime)
+import Time exposing (Time, second)
+import Task exposing (Task)
 
 
 type alias Port =
@@ -16,6 +19,8 @@ type alias Port =
 type alias Model =
     { uid : Int
     , ports : List Port
+    , time : Time
+    , debug : String
     }
 
 
@@ -23,6 +28,8 @@ initModel : Model
 initModel =
     { uid = 0
     , ports = []
+    , time = 0
+    , debug = ""
     }
 
 
@@ -30,11 +37,17 @@ type Msg
     = AddPort
     | AddLabel
     | RemovePort Int
+    | Tick Time
+    | SetSerial Int
+
+
+
+-- | Noop
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( initModel, Cmd.none )
+    ( initModel, Cmd.batch [ getSerial ] )
 
 
 main : Program Never Model Msg
@@ -68,6 +81,12 @@ update msg model =
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
                 ! []
+
+        Tick newTime ->
+            ( { model | time = newTime }, Cmd.none )
+
+        SetSerial time ->
+            ( { model | debug = (toString time) }, Cmd.none )
 
 
 control_view : Model -> Html Msg
@@ -128,6 +147,10 @@ port_view port_ =
             [ text "Подключить" ]
         , button [ onClick (RemovePort port_.id) ] [ text "Удалить" ]
         , text (toString port_)
+        , text " / "
+        , text (toString (Serial.loadTime))
+        , text " / "
+        , text (toString (Serial.addOne port_.id))
         ]
 
 
@@ -136,6 +159,23 @@ ports_view ports =
     ports
         |> List.map (\c -> port_view c)
         |> div [ class "port_list" ]
+
+
+
+-- resetFavicon : Cmd Msg
+-- resetFavicon =
+--     Cmd.map (always Noop)
+--         << Task.perform Err Ok
+--     <|
+--         (Serial.set ("/public/images/favicon.png"))
+
+
+getSerial : Cmd Msg
+getSerial =
+    -- Time.now
+    Serial.get
+        |> Task.perform
+            SetSerial
 
 
 view : Model -> Html Msg
@@ -149,5 +189,8 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    -- Time.every second Tick
-    Sub.none
+    Time.every second Tick
+
+
+
+-- Sub.none

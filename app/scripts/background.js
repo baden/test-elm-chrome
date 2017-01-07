@@ -9,8 +9,8 @@ chrome.app.runtime.onLaunched.addListener(function() {
         // id: 'TTY_Logger_Chrome_WindowID',
         // frame: 'none',
         bounds: {
-            width: 1024,
-            height: 600
+            width: 720,
+            height: 400
         },
         // frame: 'none',
         minWidth: 512,
