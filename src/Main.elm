@@ -5,9 +5,9 @@
 module Main exposing (..)
 
 import Html exposing (Html, div, button, text, select, option)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, value)
 import Html.Events exposing (onClick)
-import Serial exposing (loadTime)
+import Serial
 import Time exposing (Time, second)
 import Task exposing (Task)
 
@@ -18,6 +18,7 @@ type alias Port =
 
 type alias Model =
     { uid : Int
+    , portList : List Serial.Port
     , ports : List Port
     , time : Time
     , debug : String
@@ -27,6 +28,7 @@ type alias Model =
 initModel : Model
 initModel =
     { uid = 0
+    , portList = []
     , ports = []
     , time = 0
     , debug = ""
@@ -38,7 +40,7 @@ type Msg
     | AddLabel
     | RemovePort Int
     | Tick Time
-    | SetSerial Int
+    | SetSerialDevices (List Serial.Port)
 
 
 
@@ -47,7 +49,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( initModel, Cmd.batch [ getSerial ] )
+    ( initModel, Cmd.batch [ getSerialDevices ] )
 
 
 main : Program Never Model Msg
@@ -85,8 +87,8 @@ update msg model =
         Tick newTime ->
             ( { model | time = newTime }, Cmd.none )
 
-        SetSerial time ->
-            ( { model | debug = (toString time) }, Cmd.none )
+        SetSerialDevices ports ->
+            ( { model | portList = ports }, Cmd.none )
 
 
 control_view : Model -> Html Msg
@@ -108,13 +110,16 @@ listToHtmlSelectOptions list =
         |> List.map toSelectOption
 
 
-fakePortList : List String
-fakePortList =
-    [ "Выберите порт:"
-    , "COM1"
-    , "COM2"
-    , "COM3"
-    ]
+portOption : Serial.Port -> Html a
+portOption p =
+    option [ value (toString p.path) ]
+        [ text (p.path ++ ":" ++ p.displayName) ]
+
+
+listPorts : List Serial.Port -> List (Html a)
+listPorts list =
+    list
+        |> List.map portOption
 
 
 fakeSpeedList : List String
@@ -137,10 +142,10 @@ fakeSpeedList =
     ]
 
 
-port_view : Port -> Html Msg
-port_view port_ =
+port_view : Model -> Port -> Html Msg
+port_view model port_ =
     div [ class "port" ]
-        [ select [] (listToHtmlSelectOptions fakePortList)
+        [ select [] (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
         , button
             []
@@ -154,10 +159,10 @@ port_view port_ =
         ]
 
 
-ports_view : List Port -> Html Msg
-ports_view ports =
+ports_view : Model -> List Port -> Html Msg
+ports_view model ports =
     ports
-        |> List.map (\c -> port_view c)
+        |> List.map (\c -> port_view model c)
         |> div [ class "port_list" ]
 
 
@@ -170,18 +175,18 @@ ports_view ports =
 --         (Serial.set ("/public/images/favicon.png"))
 
 
-getSerial : Cmd Msg
-getSerial =
+getSerialDevices : Cmd Msg
+getSerialDevices =
     -- Time.now
-    Serial.get
+    Serial.getDevices
         |> Task.perform
-            SetSerial
+            SetSerialDevices
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ ports_view model.ports
+        [ ports_view model model.ports
         , control_view model
         , div [] [ text (toString model) ]
         ]
@@ -189,8 +194,5 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every second Tick
-
-
-
--- Sub.none
+    -- Time.every second Tick
+    Sub.none

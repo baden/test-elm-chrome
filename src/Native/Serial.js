@@ -31,11 +31,34 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     //     });
     // }
 
-    var get = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+    // var Nil = { ctor: '[]' };
+
+    function Cons(hd, tl)
+    {
+    	return { ctor: '::', _0: hd, _1: tl };
+    }
+
+    function fromArray(arr)
+    {
+    	var out = { ctor: '[]' };
+    	for (var i = arr.length; i--; )
+    	{
+    		out = Cons(arr[i], out);
+    	}
+    	return out;
+    }
+
+    var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
     {
         chrome.serial.getDevices(function(ports){
             console.log("ports=", ports);
-            callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+            var elmPorts = ports.map(function(port) {
+                var displayName = port.displayName || "";
+                return {displayName, path: port.path};
+            });
+
+            // callback(_elm_lang$core$Native_Scheduler.succeed([Date.now()]));
+            callback(_elm_lang$core$Native_Scheduler.succeed(fromArray(elmPorts)));
         });
     });
 
@@ -44,29 +67,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         loadTime: (new window.Date).getTime(),
         addOne: addOne,
         // set: set,
-        get: get
+        getDevices: getDevices
     };
 
 }();
-
-
-// Elm.Native.Serial = {};
-//
-// Elm.Native.Serial.make = function(localRuntime) {
-//     console.log("WTF", localRuntime);
-//   localRuntime.Native = localRuntime.Native || {};
-//
-//
-//   localRuntime.Native.Serial = localRuntime.Native.Serial || {};
-//
-//   if (localRuntime.Native.Serial.values) {
-//     return localRuntime.Native.Serial.values;
-//   }
-//
-//   var Result = Elm.Result.make(localRuntime);
-//
-//   return localRuntime.Native.Serial.values = {
-//     loadTime: (new window.Date).getTime()
-//   };
-//
-// };
