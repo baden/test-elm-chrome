@@ -4,22 +4,30 @@
 
 module Main exposing (..)
 
-import Html exposing (beginnerProgram, node, div, button, text)
-import Html.Attributes exposing (attribute)
+import Html exposing (beginnerProgram, div, button, text)
 import Html.Events exposing (onClick)
 
 
-main : Program Never number Msg
+type alias Model =
+    { counter : Int
+    }
+
+
+init : Model
+init =
+    { counter = 0 }
+
+
+main : Program Never Model Msg
 main =
-    beginnerProgram { model = 0, view = view, update = update }
+    beginnerProgram { model = init, view = view, update = update }
 
 
-view : a -> Html.Html Msg
+view : Model -> Html.Html Msg
 view model =
     div []
-        [ stylesheet
-        , button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (toString model) ]
+        [ button [ onClick Decrement ] [ text "-" ]
+        , div [] [ text (toString model.counter) ]
         , button [ onClick Increment ] [ text "+" ]
         ]
 
@@ -29,23 +37,11 @@ type Msg
     | Decrement
 
 
-update : Msg -> number -> number
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Increment ->
-            model + 1
+            { model | counter = model.counter + 1 }
 
         Decrement ->
-            model - 1
-
-
-stylesheet : Html.Html msg
-stylesheet =
-    let
-        attrs =
-            [ attribute "rel" "stylesheet"
-            , attribute "property" "stylesheet"
-            , attribute "href" "../app/css/main.css"
-            ]
-    in
-        node "link" attrs []
+            { model | counter = model.counter - 1 }

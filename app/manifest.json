@@ -1,15 +1,32 @@
 {
-  "manifest_version": 2,
+    "manifest_version": 2,
 
-  "name": "Example extension with Elm",
-  "description": "This is just a minimalistic example of how to build a Chrome extension with Elm",
-  "version": "1.0",
+    "name": "Loger/3",
+    "description": "This is just a minimalistic example of how to build a Chrome extension with Elm",
+    "version": "0.0.1",
 
-  "browser_action": {
-    "default_popup": "index.html"
-  },
+    "icons": {
+        "16": "images/search-16.png",
+        "128": "images/search-128.png"
+    },
 
-  "permissions": [
-    "activeTab"
-  ]
+    "app": {
+		"background": {
+			"scripts": [
+				"scripts/background.js"
+			]
+		}
+	},
+
+    "permissions": [
+		"clipboardWrite",
+		"serial",
+		{
+			"fileSystem": [
+				"write"
+			]
+		},
+		"http://*/*",
+		"https://*/*"
+	]
 }
