@@ -50,6 +50,16 @@ var _baden$test_elm_chrome$Native_Serial = function() {
 
     var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
     {
+        // Fake ports for eazy debug
+        if(!chrome || !chrome.serial) {
+            var elmPorts = [{displayName : "Эмуляция!", path: "/dev/ttyUSB0"}
+                , {displayName : "Эмуляция!", path: "/dev/ttyUSB1"}
+                , {displayName : "Эмуляция!", path: "/dev/ttyUSB2"}
+                , {displayName : "Эмуляция!", path: "/dev/ttyUSB3"}
+            ];
+            callback(_elm_lang$core$Native_Scheduler.succeed(fromArray(elmPorts)));
+            return;
+        }
         chrome.serial.getDevices(function(ports){
             console.log("ports=", ports);
             var elmPorts = ports.map(function(port) {
