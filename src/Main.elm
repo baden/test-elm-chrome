@@ -113,7 +113,7 @@ listToHtmlSelectOptions list =
 portOption : Serial.Port -> Html a
 portOption p =
     option [ value (toString p.path) ]
-        [ text (p.path ++ ":" ++ p.displayName) ]
+        [ text (p.path ++ " : " ++ p.displayName) ]
 
 
 listPorts : List Serial.Port -> List (Html a)

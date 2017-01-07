@@ -11,14 +11,21 @@ button, select {
     height: 30px;
     font-family: 'Open Sans Condensed', sans-serif;
     text-shadow: 0 1px 0 rgb(240, 240, 240);
-    background: transparent;
+    /*background: transparent;*/
+    background: #fff;
     /*-webkit-appearance: none;
     appearance: none;*/
     border: 1px solid #ccc;
 }
 
 button:hover, select:hover {
-    background: #eee;
+    /*background: #eee;*/
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    border: 1px solid #444;
+}
+
+:focus {
+    outline: #666 auto 5px;
 }
 
 /*select > option * {

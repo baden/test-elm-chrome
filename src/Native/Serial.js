@@ -71,3 +71,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     };
 
 }();
+
+// Как сделать остальное, можно подсмотреть тут:
+// https://github.com/elm-lang/websocket/blob/1.0.2/src/Native/WebSocket.js
+// https://github.com/elm-lang/websocket/blob/1.0.2/src/WebSocket/LowLevel.elm
