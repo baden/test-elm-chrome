@@ -1,8 +1,110 @@
-body {
-    padding: 4px;
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    padding: 0;
     margin: 0;
+    height: 100%;
     /*margin: 20px;*/
     /*font-size: 100%;*/
+    overflow: hidden;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+
+.workspace {
+    width: 100%;
+    height: 100%;
+    /*background-color: #f5f5ff;*/
+    /*background-color: #eee;*/
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #888;
+}
+
+.vertical {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    -webkit-app-region: drag;
+    padding: 6px;
+    border-bottom: 1px solid rgba(0,0,0, 0.5);
+}
+
+.toolbox {
+    margin: 0;
+    padding: 0;
+    /*border-bottom: 1px solid rgba(0,0,0, 0.5);*/
+    position: relative;
+    /*opacity: 0.7;*/
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.5);
+}
+
+.log {
+    /*border: 1px solid #ccc;*/
+    margin: 2px;
+    position: relative;
+    -webkit-flex: auto;
+    overflow-y: scroll;
+    -webkit-user-select: text;
+}
+
+pre.log {
+    clear: left;
+    font-family: monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    counter-reset: line-numbering;
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+pre.log p {
+    padding: 0 15px;
+    margin: 0;
+    min-height: 16px;
+    font-weight: bold;
+    border: none;
+}
+
+pre.log p a {
+    display: inline-block;
+    text-align: right;
+    min-width: 60px;
+    margin-left: -16px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: normal;
+}
+a {
+    color: #428bca;
+    text-decoration: none;
+    background: transparent;
+}
+img, a {
+    -webkit-user-drag: none;
+}
+
+pre.log p a::before {
+  content: counter(line-numbering, decimal);
+  counter-increment: line-numbering;
+  padding-right: 1em;
 }
 
 button, select {
@@ -26,6 +128,19 @@ button:hover, select:hover {
 
 :focus {
     outline: #666 auto 5px;
+}
+
+
+.debug {
+    border: 1px solid #ccc;
+    margin: 2px;
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    right: 20px;
+    bottom: 20px;
+    overflow: scroll;
+    box-shadow: 1px 1px 5px #000;
 }
 
 /*select > option * {
