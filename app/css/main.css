@@ -53,6 +53,7 @@ body {
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
 }
 
+
 .log {
     /*border: 1px solid #ccc;*/
     margin: 2px;
@@ -65,7 +66,7 @@ body {
 pre.log {
     clear: left;
     font-family: monospace;
-    font-size: 14px;
+    font-size: 16px;
     white-space: pre-wrap;
     word-wrap: break-word;
     counter-reset: line-numbering;
@@ -82,8 +83,14 @@ pre.log p {
     padding: 0 15px;
     margin: 0;
     min-height: 16px;
-    font-weight: bold;
+    /*font-weight: bold;*/
     border: none;
+
+    height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* word-break: break-all; */
+    white-space: nowrap;
 }
 
 pre.log p a {
@@ -110,12 +117,13 @@ pre.log p a::before {
   padding-right: 1em;
 }
 
-button, select {
+button, select, .control span {
     padding: 4px 8px;
     margin: 2px;
     /*height: 30px;*/
     font-family: 'Open Sans Condensed', sans-serif;
     text-shadow: 0 1px 0 rgb(240, 240, 240);
+    font-size: 18px;
     /*background: transparent;*/
     background: #fff;
     /*-webkit-appearance: none;
@@ -123,9 +131,52 @@ button, select {
     border: 1px solid #ccc;
 }
 
-button:hover, select:hover {
+span.find {
+    display: inline-block;
+    padding: 2px 4px;
+    /*margin: 0px;*/
+}
+
+span.find input {
+    padding: 3px 4px;
+    margin: 0;
+    margin-left: 8px;
+    font-size: 14px;
+    /*box-shadow: inset 0px -10px 10px -10px rgba(0,0,0,0.2);*/
+    border: none;
+    border-right: 1px solid #ccc;
+}
+
+span.find span {
+    border: none;
+}
+
+span.find span:hover {
+    /*background-color: #888;*/
+    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.2);
+    /*border: 1px solid #444;*/
+    cursor: pointer;
+}
+
+button.active {
+    background: #4187db;
+    color: white;
+    text-shadow: none;
+}
+
+button.good {
+    /*font-weight: bold;*/
+    color: #090;
+}
+
+button.bad {
+    /*color: red;*/
+    color: #900;
+}
+
+button:hover:enabled, select:hover:enabled {
     /*background: #eee;*/
-    box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.2);
     border: 1px solid #444;
 }
 
@@ -144,14 +195,11 @@ button:hover, select:hover {
     bottom: 20px;
     overflow: scroll;
     box-shadow: 1px 1px 5px #000;
+    background-color: white;
 }
 
-/*select > option * {
-    padding: 4px 8px;
-}*/
-
 select {
-  width: 120px;
+  max-width: 160px;
 /*   padding: 5px 35px 5px 5px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -160,17 +208,21 @@ select {
   */
 }
 
+/*select > option * {
+    padding: 4px 8px;
+}*/
 
-select option {
+
+/*select option {
     border: 10px solid #000;
     padding: 10px;
     margin: 10px;
-}
+}*/
 /*target Internet Explorer 9 and Internet Explorer 10:*/
 
-@media screen and (min-width: 0\0) {
+/*@media screen and (min-width: 0\0) {
   select {
     background: none;
     padding: 5px;
   }
-}
+}*/

@@ -23,6 +23,7 @@ type alias Model =
     , debug : String
     , logs : List String
     , shouldScroll : Bool
+    , scrollEvent : OnScrollEvent
     }
 
 
@@ -35,8 +36,9 @@ initModel =
     , debug =
         ""
         -- , logs = []
-    , logs = List.repeat 10 "Fake log"
+    , logs = List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
     , shouldScroll = False
+    , scrollEvent = OnScrollEvent 0 0 0
     }
 
 
@@ -64,6 +66,11 @@ type alias OnScrollEvent =
     { height : Float
     , top : Float
     , clientHeight : Float
+    }
+
+
+type alias LogLine =
+    { data : String
     }
 
 

@@ -3,6 +3,7 @@ module Update
         ( init
         , update
         , onScroll
+        , onResize
         )
 
 import Task exposing (Task)
@@ -44,6 +45,12 @@ onScroll : (OnScrollEvent -> msg) -> Html.Attribute msg
 onScroll tagger =
     Json.Decode.map tagger onScrollJsonParser
         |> Html.Events.on "scroll"
+
+
+onResize : (OnScrollEvent -> msg) -> Html.Attribute msg
+onResize tagger =
+    Json.Decode.map tagger onScrollJsonParser
+        |> Html.Events.on "resize"
 
 
 onScrollJsonParser : Json.Decode.Decoder OnScrollEvent
@@ -111,6 +118,7 @@ update msg model =
         ChatScrolled event ->
             { model
                 | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
+                , scrollEvent = event
             }
                 ! []
 

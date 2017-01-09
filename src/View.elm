@@ -1,7 +1,7 @@
 module View exposing (view)
 
-import Html exposing (Html, div, button, text, select, option, p, pre, a)
-import Html.Attributes exposing (class, value, id)
+import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span)
+import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder)
 import Html.Events exposing (onClick)
 import Types
     exposing
@@ -17,8 +17,26 @@ import Update exposing (onScroll)
 control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
-        [ button [ onClick AddPort ] [ text "Добавить порт" ]
-        , button [ onClick AddLabel ] [ text "Поставить метку" ]
+        [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
+        , button [ title "Поставить метку", onClick AddLabel ] [ text "🖈" ]
+        , button [ title "Пометить как хорошее", class "good" ] [ text "🙂" ]
+        , button [ title "Пометить как плохое", class "bad" ] [ text "🙁" ]
+        , button [ title "К предыдущей метке" ] [ text "⏮" ]
+        , button [ title "К следующей метке" ] [ text "⏭" ]
+        , button [ title "Запустить секундомер" ] [ text "⏱" ]
+        , button [ title "Отключить автопрокрутку" ] [ text "⏸" ]
+        , button [ title "Включить автопрокрутку", disabled True, class "active" ] [ text "⏵" ]
+        , button [ title "Запись в облако" ] [ text "🌍" ]
+        , span [ class "find" ]
+            [ text "🔍"
+            , input [ type_ "input", placeholder "Поиск" ] []
+            , span [ title "Назад" ] [ text "⏶" ]
+            , span [ title "Далее" ] [ text "⏷" ]
+            ]
+        , button [ title "Заметка" ] [ text "🗩" ]
+        , button [ title "Сохранить в файл" ] [ text "💾" ]
+          -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
+        , button [ title "Настройки" ] [ text "🛠" ]
         ]
 
 
@@ -33,10 +51,20 @@ listToHtmlSelectOptions list =
         |> List.map toSelectOption
 
 
+portLabel : String -> String -> String
+portLabel path name =
+    case name of
+        "" ->
+            path
+
+        _ ->
+            path ++ " : " ++ name
+
+
 portOption : Serial.Port -> Html a
 portOption p =
     option [ value (toString p.path) ]
-        [ text (p.path ++ " : " ++ p.displayName) ]
+        [ text (portLabel p.path p.displayName) ]
 
 
 listPorts : List Serial.Port -> List (Html a)
@@ -47,7 +75,7 @@ listPorts list =
 
 fakeSpeedList : List String
 fakeSpeedList =
-    [ "Скорость :"
+    [ "Скорость"
     , "1200"
     , "2400"
     , "4800"
@@ -70,15 +98,16 @@ port_view model port_ =
     div [ class "port" ]
         [ select [] (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
-        , button
-            []
-            [ text "Подключить" ]
-        , button [ onClick (RemovePort port_.id) ] [ text "Удалить" ]
-        , text (toString port_)
-        , text " / "
-        , text (toString (Serial.loadTime))
-        , text " / "
-        , text (toString (Serial.addOne port_.id))
+        , button [] [ text "⏺ Подключить" ]
+        , button [] [ text "⏹ Отключить" ]
+        , button [ title "Цвет текста" ] [ text "⏹" ]
+        , button [ onClick (RemovePort port_.id) ] [ text "🚮 Удалить" ]
+          -- 🞩
+          -- , text (toString port_)
+          -- , text " / "
+          -- , text (toString (Serial.loadTime))
+          -- , text " / "
+          -- , text (toString (Serial.addOne port_.id))
         ]
 
 
@@ -111,17 +140,51 @@ log_row data =
 
 log_view : Model -> Html Msg
 log_view model =
-    div [ class "log", id "log", onScroll ChatScrolled ]
+    div [ class "log", id "log", onScroll ChatScrolled, onScroll ChatScrolled ]
         [ model.logs
             |> List.foldl (\d acc -> log_row d :: acc) []
             |> pre [ class "log" ]
         ]
 
 
+logLineHeight : Float
+logLineHeight =
+    25
+
+
+debug_scroll_view : Types.OnScrollEvent -> Html msg
+debug_scroll_view e =
+    case e.clientHeight of
+        0 ->
+            text "No data yet"
+
+        clientHeight ->
+            let
+                lines =
+                    clientHeight / logLineHeight + 1
+
+                startLine =
+                    e.top / logLineHeight
+
+                start =
+                    round startLine
+
+                stop =
+                    round (startLine + lines)
+            in
+                text
+                    ("Lines from "
+                        ++ (toString start)
+                        ++ " to "
+                        ++ (toString stop)
+                    )
+
+
 debug_view : Model -> Html Msg
 debug_view model =
     div [ class "debug" ]
-        [ p [] [ text (toString model) ]
+        [ debug_scroll_view model.scrollEvent
+        , p [] [ text (toString model) ]
         ]
 
 
@@ -131,8 +194,8 @@ view model =
         [ div [ class "vertical" ]
             [ -- div [ class "header" ] [ text "Логер 3" ]
               div [ class "toolbox" ]
-                [ ports_view model model.ports
-                , control_view model
+                [ control_view model
+                , ports_view model model.ports
                 ]
             , log_view model
             ]
