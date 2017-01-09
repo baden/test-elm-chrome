@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span)
-import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder)
+import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder, style)
 import Html.Events exposing (onClick)
 import Types
     exposing
@@ -12,6 +12,7 @@ import Types
         )
 import Serial
 import Update exposing (onScroll)
+import Array exposing (Array)
 
 
 control_view : Model -> Html Msg
@@ -130,21 +131,81 @@ ports_view model ports =
 --     List.repeat 10000 "Log"
 
 
-log_row : String -> Html Msg
-log_row data =
-    p []
-        [ a [] []
+log_row : String -> Int -> Html Msg
+log_row data offset =
+    p [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ] ]
+        [ a [] [ text (toString (offset + 1)) ]
         , text data
         ]
 
 
+
+-- log_view : Model -> Html Msg
+-- log_view model =
+--     div [ class "log", id "log", onScroll ChatScrolled, onScroll ChatScrolled ]
+--         [ model.logs
+--             |> List.foldl (\d acc -> log_row d :: acc) []
+--             |> pre [ class "log" ]
+--         ]
+
+
+sliceLog : Int -> Int -> Array String -> List (Html Msg)
+sliceLog start stop logs =
+    -- [ ("Show from " ++ (toString start) ++ " to " ++ (toString stop)) ]
+    let
+        f : String -> ( Int, List (Html Msg) ) -> ( Int, List (Html Msg) )
+        f =
+            \d ( index, acc ) -> ( index + 1, log_row d index :: acc )
+    in
+        Array.slice start stop logs
+            |> Array.foldl f ( start, [] )
+            |> Tuple.second
+
+
+
+-- |> Array.toList
+-- |> List.map f
+
+
 log_view : Model -> Html Msg
 log_view model =
-    div [ class "log", id "log", onScroll ChatScrolled, onScroll ChatScrolled ]
-        [ model.logs
-            |> List.foldl (\d acc -> log_row d :: acc) []
-            |> pre [ class "log" ]
-        ]
+    let
+        e =
+            model.scrollEvent
+
+        logSize =
+            Array.length model.logs
+
+        lines =
+            case e.clientHeight of
+                0 ->
+                    100
+
+                -- Пока размер окна не определен, будем считать что у нас 100 строк
+                h ->
+                    h / logLineHeight + 1
+
+        startLine =
+            e.top / logLineHeight
+
+        start =
+            max 0 (round startLine)
+
+        stop =
+            min logSize (round (startLine + lines))
+    in
+        div
+            [ class "log"
+            , id "log"
+            , onScroll ChatScrolled
+            , onScroll ChatScrolled
+            ]
+            [ sliceLog start stop model.logs
+                |> pre
+                    [ class "log"
+                    , style [ ( "height", (toString ((toFloat logSize) * logLineHeight)) ++ "px" ) ]
+                    ]
+            ]
 
 
 logLineHeight : Float
@@ -152,9 +213,9 @@ logLineHeight =
     25
 
 
-debug_scroll_view : Types.OnScrollEvent -> Html msg
-debug_scroll_view e =
-    case e.clientHeight of
+debug_scroll_view : Types.Model -> Html msg
+debug_scroll_view m =
+    case m.scrollEvent.clientHeight of
         0 ->
             text "No data yet"
 
@@ -164,27 +225,32 @@ debug_scroll_view e =
                     clientHeight / logLineHeight + 1
 
                 startLine =
-                    e.top / logLineHeight
+                    m.scrollEvent.top / logLineHeight
 
                 start =
                     round startLine
 
                 stop =
                     round (startLine + lines)
+
+                logSize =
+                    Array.length m.logs
             in
                 text
                     ("Lines from "
                         ++ (toString start)
                         ++ " to "
                         ++ (toString stop)
+                        ++ " Log size="
+                        ++ (toString logSize)
                     )
 
 
 debug_view : Model -> Html Msg
 debug_view model =
     div [ class "debug" ]
-        [ debug_scroll_view model.scrollEvent
-        , p [] [ text (toString model) ]
+        [ debug_scroll_view model
+          -- , p [] [ text (toString model) ]
         ]
 
 

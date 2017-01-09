@@ -10,6 +10,7 @@ module Types
 
 import Serial
 import Time exposing (Time)
+import Array exposing (Array)
 
 
 -- import Dom
@@ -21,7 +22,7 @@ type alias Model =
     , ports : List Port
     , time : Time
     , debug : String
-    , logs : List String
+    , logs : Array String
     , shouldScroll : Bool
     , scrollEvent : OnScrollEvent
     }
@@ -36,7 +37,16 @@ initModel =
     , debug =
         ""
         -- , logs = []
-    , logs = List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
+        -- , logs = Array.fromList (List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!")
+    , logs =
+        List.range 1 999999
+            |> List.map
+                (\c ->
+                    "Fake log #"
+                        ++ (toString c)
+                        ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
+                )
+            |> Array.fromList
     , shouldScroll = False
     , scrollEvent = OnScrollEvent 0 0 0
     }

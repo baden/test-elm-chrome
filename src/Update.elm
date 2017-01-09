@@ -21,6 +21,7 @@ import Dom.Scroll
 import Json.Decode
 import Html
 import Html.Events
+import Array exposing (Array)
 
 
 -- import Html.Attributes
@@ -100,7 +101,8 @@ update msg model =
         AddLabel ->
             let
                 new_logs =
-                    "Label" :: model.logs
+                    -- "Label" :: model.logs
+                    Array.push "Label" model.logs
             in
                 { model | logs = new_logs }
                     ! [ scrollToBottom ]

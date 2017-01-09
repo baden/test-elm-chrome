@@ -69,7 +69,7 @@ pre.log {
     font-size: 16px;
     white-space: pre-wrap;
     word-wrap: break-word;
-    counter-reset: line-numbering;
+    /*counter-reset: line-numbering;*/
     overflow: hidden;
     border: none;
     padding: 0;
@@ -80,13 +80,16 @@ pre.log {
 }
 
 pre.log p {
+    position: absolute;
+    height: 25px;
+    width: 100%;
+
     padding: 0 15px;
     margin: 0;
     min-height: 16px;
     /*font-weight: bold;*/
     border: none;
 
-    height: 25px;
     overflow: hidden;
     text-overflow: ellipsis;
     /* word-break: break-all; */
@@ -98,6 +101,7 @@ pre.log p a {
     text-align: right;
     min-width: 60px;
     margin-left: -16px;
+    margin-right: 8px;
     cursor: pointer;
     text-decoration: none;
     font-weight: normal;
@@ -111,11 +115,11 @@ img, a {
     -webkit-user-drag: none;
 }
 
-pre.log p a::before {
+/*pre.log p a::before {
   content: counter(line-numbering, decimal);
   counter-increment: line-numbering;
   padding-right: 1em;
-}
+}*/
 
 button, select, .control span {
     padding: 4px 8px;
