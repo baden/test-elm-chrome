@@ -106,11 +106,21 @@ pre.log p a {
     text-decoration: none;
     font-weight: normal;
 }
+
+/*pre.log p[class^="port_"] {
+    color: red;
+}*/
+
+pre.log p[class^="label_"] {
+    color: green;
+}
+
 a {
     color: #428bca;
     text-decoration: none;
     background: transparent;
 }
+
 img, a {
     -webkit-user-drag: none;
 }

@@ -1,6 +1,6 @@
 module View exposing (view)
 
-import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span)
+import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span, node)
 import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder, style, attribute)
 import Html.Events exposing (onClick)
 import Types
@@ -9,6 +9,8 @@ import Types
         , Model
         , initModel
         , Msg(..)
+        , LogLine
+        , Sender(..)
         )
 import Serial
 import Update exposing (onScroll)
@@ -19,7 +21,6 @@ control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
         [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
-        , button [ title "Очистить лог", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Поставить метку", onClick AddLabel ] [ text "🖈" ]
         , button [ title "Пометить как хорошее", class "good" ] [ text "🙂" ]
         , button [ title "Пометить как плохое", class "bad" ] [ text "🙁" ]
@@ -28,6 +29,7 @@ control_view model =
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
         , button [ title "Отключить автопрокрутку" ] [ text "⏸" ]
         , button [ title "Включить автопрокрутку", disabled True, class "active" ] [ text "⏵" ]
+        , button [ title "Очистить лог", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Запись в облако" ] [ text "🌍" ]
         , span [ class "find" ]
             [ text "🔍"
@@ -132,10 +134,11 @@ ports_view model ports =
 --     List.repeat 10000 "Log"
 
 
-log_row : String -> Int -> Html Msg
-log_row data offset =
+log_row : LogLine -> Int -> Html Msg
+log_row l offset =
     p
         [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ]
+        , class (logClassName l)
           --   attribute
           --     "style"
           --     ("top: "
@@ -144,8 +147,18 @@ log_row data offset =
           --     )
         ]
         [ a [] [ text (toString (offset + 1)) ]
-        , text data
+        , text l.data
         ]
+
+
+logClassName : LogLine -> String
+logClassName l =
+    case l.sender of
+        PortId id ->
+            "port_" ++ (toString id)
+
+        LabelId id ->
+            "label_" ++ (toString id)
 
 
 
@@ -158,11 +171,11 @@ log_row data offset =
 --         ]
 
 
-sliceLog : Int -> Int -> Array String -> List (Html Msg)
+sliceLog : Int -> Int -> Array LogLine -> List (Html Msg)
 sliceLog start stop logs =
     -- [ ("Show from " ++ (toString start) ++ " to " ++ (toString stop)) ]
     let
-        f : String -> ( Int, List (Html Msg) ) -> ( Int, List (Html Msg) )
+        f : LogLine -> ( Int, List (Html Msg) ) -> ( Int, List (Html Msg) )
         f =
             \d ( index, acc ) -> ( index + 1, log_row d index :: acc )
     in
@@ -275,4 +288,56 @@ view model =
             , log_view model
             ]
         , debug_view model
+        , stylesheet model
+        ]
+
+
+stylesheet : Model -> Html Msg
+stylesheet m =
+    let
+        -- tag =
+        --     "link"
+        --
+        -- attrs =
+        --     [ attribute "rel" "stylesheet"
+        --     , attribute "property" "stylesheet"
+        --     , attribute "href" "css.css"
+        --     ]
+        tag =
+            "style"
+
+        attrs =
+            []
+
+        rule id =
+            "pre.log p[class^=\"port_"
+                ++ (toString id)
+                ++ "\"] {"
+                ++ "color: "
+                ++ (getColor id)
+                ++ ";}\n"
+
+        rules =
+            m.ports
+                |> List.map (\c -> rule c.id)
+                |> String.concat
+    in
+        node tag
+            attrs
+            [ text rules ]
+
+
+getColor : Int -> String
+getColor i =
+    Array.get (i % Array.length portColors) portColors
+        |> Maybe.withDefault "black"
+
+
+portColors : Array String
+portColors =
+    Array.fromList
+        [ "red"
+        , "blue"
+        , "brown"
+        , "magenta"
         ]

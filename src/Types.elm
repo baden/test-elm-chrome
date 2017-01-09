@@ -6,11 +6,15 @@ module Types
         , Msg(..)
         , initPort
         , OnScrollEvent
+          -- , fakeLog
+        , LogLine
+        , Sender(..)
         )
 
 import Serial
 import Time exposing (Time)
 import Array exposing (Array)
+import Time exposing (Time)
 
 
 -- import Dom
@@ -22,7 +26,7 @@ type alias Model =
     , ports : List Port
     , time : Time
     , debug : String
-    , logs : Array String
+    , logs : Array LogLine
     , shouldScroll : Bool
     , scrollEvent : OnScrollEvent
     }
@@ -43,14 +47,24 @@ initModel =
         List.range 1 1000
             |> List.map
                 (\c ->
-                    "Fake log #"
-                        ++ (toString c)
-                        ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
+                    fakeLog
+                        (c % 4)
+                        0
+                        ("Fake log #"
+                            ++ (toString c)
+                            ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
+                        )
                 )
             |> Array.fromList
     , shouldScroll = False
     , scrollEvent = OnScrollEvent 0 0 0
     }
+
+
+
+-- "Fake log #"
+--     ++ (toString c)
+--     ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
 
 
 type alias Port =
@@ -81,9 +95,24 @@ type alias OnScrollEvent =
     }
 
 
+type Sender
+    = PortId Int
+    | LabelId Int
+
+
 type alias LogLine =
     { data : String
+    , timestamp : Time
+    , sender : Sender
     }
+
+
+fakeLog : Int -> Time -> String -> LogLine
+fakeLog id timestamp data =
+    LogLine
+        data
+        timestamp
+        (PortId id)
 
 
 

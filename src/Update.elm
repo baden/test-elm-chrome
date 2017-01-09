@@ -22,8 +22,10 @@ import Json.Decode
 import Html
 import Html.Events
 import Array exposing (Array)
+import Time exposing (Time)
 
 
+-- import Date
 -- import Html.Attributes
 -- import Dom
 -- import Time
@@ -84,6 +86,14 @@ onScrollJsonParser =
 --                 NoOp
 
 
+fakeLog : Time -> String -> Types.LogLine
+fakeLog timestamp data =
+    Types.LogLine
+        data
+        timestamp
+        (Types.LabelId 0)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -102,7 +112,13 @@ update msg model =
             let
                 new_logs =
                     -- "Label" :: model.logs
-                    Array.push "Label" model.logs
+                    -- Array.push "Label" model.logs
+                    Array.push
+                        (fakeLog
+                            0
+                            "==============================================="
+                        )
+                        model.logs
             in
                 { model | logs = new_logs }
                     ! [ scrollToBottom ]
