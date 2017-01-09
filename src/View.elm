@@ -198,10 +198,10 @@ log_view model =
             e.top / logLineHeight
 
         start =
-            max 0 (round startLine)
+            max 0 ((round startLine) - 10)
 
         stop =
-            min logSize (round (startLine + lines))
+            min logSize ((round (startLine + lines)) + 10)
     in
         div
             [ class "log"
