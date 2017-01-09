@@ -11,6 +11,9 @@ import Serial
 import Time exposing (Time)
 
 
+-- import Dom
+
+
 type alias Model =
     { uid : Int
     , portList : List Serial.Port
@@ -30,7 +33,7 @@ initModel =
     , debug =
         ""
         -- , logs = []
-    , logs = List.repeat 10000 "Fake log"
+    , logs = List.repeat 100 "Fake log"
     }
 
 
@@ -50,3 +53,8 @@ type Msg
     | RemovePort Int
     | Tick Time
     | SetSerialDevices (List Serial.Port)
+    | NoOp
+
+
+
+-- | DomError Dom.Error

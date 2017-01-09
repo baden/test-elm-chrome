@@ -10,11 +10,46 @@ import Types
         , Model
         , Msg(..)
         )
+import Dom.Scroll
+
+
+-- import Dom
+-- import Time
+-- import Process
 
 
 init : ( Model, Cmd Msg )
 init =
     ( initModel, Cmd.batch [ getSerialDevices ] )
+
+
+scrollToBottom : Cmd Msg
+scrollToBottom =
+    -- Task.perform DomError (always NoOp) (toBottom id)
+    Dom.Scroll.toBottom "log"
+        |> Task.attempt (always NoOp)
+
+
+
+-- scrollToBottom : Cmd Msg
+-- scrollToBottom =
+--     Process.sleep (1 * Time.second)
+--         |> Task.andThen (\x -> (Dom.Scroll.toBottom "log"))
+--         |> Task.attempt handleScrollResult
+--
+--
+-- handleScrollResult : Result Dom.Error () -> Msg
+-- handleScrollResult result =
+--     let
+--         _ =
+--             Debug.log "result" result
+--     in
+--         case result of
+--             Ok _ ->
+--                 NoOp
+--
+--             Err _ ->
+--                 NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -36,7 +71,8 @@ update msg model =
                 new_logs =
                     "Label" :: model.logs
             in
-                { model | logs = new_logs } ! []
+                { model | logs = new_logs }
+                    ! [ scrollToBottom ]
 
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
@@ -47,6 +83,18 @@ update msg model =
 
         SetSerialDevices ports ->
             ( { model | portList = ports }, Cmd.none )
+
+        NoOp ->
+            model ! []
+
+
+
+-- DomError err ->
+--     let
+--         _ =
+--             Debug.log "DOM error" (toString err)
+--     in
+--         ( model, Cmd.none )
 
 
 getSerialDevices : Cmd Msg

@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html, div, button, text, select, option, p, pre, a)
-import Html.Attributes exposing (class, value)
+import Html.Attributes exposing (class, value, id)
 import Html.Events exposing (onClick)
 import Types
     exposing
@@ -110,9 +110,9 @@ log_row data =
 
 log_view : Model -> Html Msg
 log_view model =
-    div [ class "log" ]
+    div [ class "log", id "log" ]
         [ model.logs
-            |> List.map (\d -> log_row d)
+            |> List.foldl (\d acc -> log_row d :: acc) []
             |> pre [ class "log" ]
         ]
 
