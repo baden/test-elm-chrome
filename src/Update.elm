@@ -107,6 +107,10 @@ update msg model =
                 { model | logs = new_logs }
                     ! [ scrollToBottom ]
 
+        ClearLog ->
+            { model | logs = Array.empty }
+                ! [ scrollToBottom ]
+
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
                 ! []

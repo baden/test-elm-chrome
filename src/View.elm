@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span)
-import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder, style)
+import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder, style, attribute)
 import Html.Events exposing (onClick)
 import Types
     exposing
@@ -19,6 +19,7 @@ control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
         [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
+        , button [ title "Очистить лог", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Поставить метку", onClick AddLabel ] [ text "🖈" ]
         , button [ title "Пометить как хорошее", class "good" ] [ text "🙂" ]
         , button [ title "Пометить как плохое", class "bad" ] [ text "🙁" ]
@@ -133,7 +134,15 @@ ports_view model ports =
 
 log_row : String -> Int -> Html Msg
 log_row data offset =
-    p [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ] ]
+    p
+        [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ]
+          --   attribute
+          --     "style"
+          --     ("top: "
+          --         ++ toString ((toFloat offset) * logLineHeight)
+          --         ++ "px"
+          --     )
+        ]
         [ a [] [ text (toString (offset + 1)) ]
         , text data
         ]

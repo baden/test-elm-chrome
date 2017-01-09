@@ -39,7 +39,8 @@ initModel =
         -- , logs = []
         -- , logs = Array.fromList (List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!")
     , logs =
-        List.range 1 999999
+        -- List.range 1 999999
+        List.range 1 1000
             |> List.map
                 (\c ->
                     "Fake log #"
@@ -64,10 +65,11 @@ initPort id =
 
 type Msg
     = AddPort
-    | AddLabel
     | RemovePort Int
     | Tick Time
     | SetSerialDevices (List Serial.Port)
+    | AddLabel
+    | ClearLog
     | NoOp
     | ChatScrolled OnScrollEvent
 
