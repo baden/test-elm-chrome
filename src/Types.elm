@@ -5,6 +5,7 @@ module Types
         , initModel
         , Msg(..)
         , initPort
+        , OnScrollEvent
         )
 
 import Serial
@@ -21,6 +22,7 @@ type alias Model =
     , time : Time
     , debug : String
     , logs : List String
+    , shouldScroll : Bool
     }
 
 
@@ -33,7 +35,8 @@ initModel =
     , debug =
         ""
         -- , logs = []
-    , logs = List.repeat 100 "Fake log"
+    , logs = List.repeat 10 "Fake log"
+    , shouldScroll = False
     }
 
 
@@ -54,6 +57,14 @@ type Msg
     | Tick Time
     | SetSerialDevices (List Serial.Port)
     | NoOp
+    | ChatScrolled OnScrollEvent
+
+
+type alias OnScrollEvent =
+    { height : Float
+    , top : Float
+    , clientHeight : Float
+    }
 
 
 

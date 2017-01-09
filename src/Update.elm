@@ -1,4 +1,9 @@
-module Update exposing (init, update)
+module Update
+    exposing
+        ( init
+        , update
+        , onScroll
+        )
 
 import Task exposing (Task)
 import Serial
@@ -9,10 +14,15 @@ import Types
         , initModel
         , Model
         , Msg(..)
+        , OnScrollEvent
         )
 import Dom.Scroll
+import Json.Decode
+import Html
+import Html.Events
 
 
+-- import Html.Attributes
 -- import Dom
 -- import Time
 -- import Process
@@ -28,6 +38,20 @@ scrollToBottom =
     -- Task.perform DomError (always NoOp) (toBottom id)
     Dom.Scroll.toBottom "log"
         |> Task.attempt (always NoOp)
+
+
+onScroll : (OnScrollEvent -> msg) -> Html.Attribute msg
+onScroll tagger =
+    Json.Decode.map tagger onScrollJsonParser
+        |> Html.Events.on "scroll"
+
+
+onScrollJsonParser : Json.Decode.Decoder OnScrollEvent
+onScrollJsonParser =
+    Json.Decode.map3 OnScrollEvent
+        (Json.Decode.at [ "target", "scrollHeight" ] Json.Decode.float)
+        (Json.Decode.at [ "target", "scrollTop" ] Json.Decode.float)
+        (Json.Decode.at [ "target", "clientHeight" ] Json.Decode.float)
 
 
 
@@ -83,6 +107,12 @@ update msg model =
 
         SetSerialDevices ports ->
             ( { model | portList = ports }, Cmd.none )
+
+        ChatScrolled event ->
+            { model
+                | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
+            }
+                ! []
 
         NoOp ->
             model ! []

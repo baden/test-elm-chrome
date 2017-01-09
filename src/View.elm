@@ -11,6 +11,7 @@ import Types
         , Msg(..)
         )
 import Serial
+import Update exposing (onScroll)
 
 
 control_view : Model -> Html Msg
@@ -40,13 +41,13 @@ portOption p =
 
 listPorts : List Serial.Port -> List (Html a)
 listPorts list =
-    list
+    ((Serial.Port "" "Порт") :: list)
         |> List.map portOption
 
 
 fakeSpeedList : List String
 fakeSpeedList =
-    [ "Выберите скорость:"
+    [ "Скорость :"
     , "1200"
     , "2400"
     , "4800"
@@ -110,7 +111,7 @@ log_row data =
 
 log_view : Model -> Html Msg
 log_view model =
-    div [ class "log", id "log" ]
+    div [ class "log", id "log", onScroll ChatScrolled ]
         [ model.logs
             |> List.foldl (\d acc -> log_row d :: acc) []
             |> pre [ class "log" ]
