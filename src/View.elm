@@ -27,10 +27,10 @@ control_view model =
         , button [ title "К предыдущей метке" ] [ text "⏮" ]
         , button [ title "К следующей метке" ] [ text "⏭" ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
-        , button [ title "Отключить автопрокрутку" ] [ text "⏸" ]
-        , button [ title "Включить автопрокрутку", disabled True, class "active" ] [ text "⏵" ]
-        , button [ title "Очистить лог", onClick ClearLog ] [ text "🚮" ]
-        , button [ title "Запись в облако" ] [ text "🌍" ]
+        , button [ title "Отключить автопрокрутку окна лога" ] [ text "⏸" ]
+        , button [ title "Включить автопрокрутку окна лога", disabled True, class "active" ] [ text "⏵" ]
+        , button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
+        , button [ title "Запись лога в облако" ] [ text "🌍" ]
         , span [ class "find" ]
             [ text "🔍"
             , input [ type_ "input", placeholder "Поиск" ] []
@@ -102,16 +102,27 @@ port_view model port_ =
     div [ class "port" ]
         [ select [] (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
-        , button [] [ text "⏺ Подключить" ]
-        , button [] [ text "⏹ Отключить" ]
-        , button [ title "Цвет текста" ] [ text "⏹" ]
-        , button [ onClick (RemovePort port_.id) ] [ text "🚮 Удалить" ]
+        , button [ title "Подключить порт и начать запись лога", style [ ( "color", "#a00" ) ] ] [ text "⏺" ]
+        , button [ title "Остановить запись лога и отключить порт", class "active" ] [ text "⏹" ]
+        , button
+            [ class "colorpicker"
+            , title "Цвет текста"
+            ]
+            [ input
+                [ type_ "color"
+                , value (getColor port_.id)
+                ]
+                []
+            ]
+        , button [ title "Удалить", onClick (RemovePort port_.id) ] [ text "🚮" ]
           -- 🞩
-          -- , text (toString port_)
-          -- , text " / "
-          -- , text (toString (Serial.loadTime))
-          -- , text " / "
-          -- , text (toString (Serial.addOne port_.id))
+        , text (toString port_)
+        , text " / "
+          --   , text (toString (Serial.loadTime))
+          --   , text " / "
+        , text (toString (port_.id))
+        , text " / "
+        , text (toString (getColor port_.id))
         ]
 
 
@@ -336,8 +347,8 @@ getColor i =
 portColors : Array String
 portColors =
     Array.fromList
-        [ "red"
-        , "blue"
-        , "brown"
-        , "magenta"
+        [ "#9F0000"
+        , "#00009F"
+        , "#9F009F"
+        , "#9F9F00"
         ]

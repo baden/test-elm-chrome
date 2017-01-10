@@ -21,3 +21,6 @@ Enjoy.
 Тут
 https://github.com/paramanders/elm-twitch-chat
 вроде самый простой и очевидный способ реализации компонентов.
+
+Посмотреть что это за HTML.lazy и с чем его едят
+https://github.com/evancz/elm-todomvc/blob/master/Todo.elm
