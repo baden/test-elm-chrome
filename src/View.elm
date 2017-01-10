@@ -103,7 +103,7 @@ port_view model port_ =
         [ select [] (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
         , button [ title "Подключить порт и начать запись лога", style [ ( "color", "#a00" ) ] ] [ text "⏺" ]
-        , button [ title "Остановить запись лога и отключить порт", class "active" ] [ text "⏹" ]
+        , button [ title "Остановить запись лога и отключить порт", disabled True, class "active" ] [ text "⏹" ]
         , button
             [ class "colorpicker"
             , title "Цвет текста"
@@ -116,13 +116,13 @@ port_view model port_ =
             ]
         , button [ title "Удалить", onClick (RemovePort port_.id) ] [ text "🚮" ]
           -- 🞩
-        , text (toString port_)
-        , text " / "
+          -- , text (toString port_)
+          -- , text " / "
           --   , text (toString (Serial.loadTime))
           --   , text " / "
-        , text (toString (port_.id))
-        , text " / "
-        , text (toString (getColor port_.id))
+          -- , text (toString (port_.id))
+          -- , text " / "
+          -- , text (toString (getColor port_.id))
         ]
 
 

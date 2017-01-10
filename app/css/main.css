@@ -233,16 +233,18 @@ button:hover:enabled, select:hover:enabled {
 
 
 .debug {
-    border: 1px solid #ccc;
+    border: 1px solid #888;
     margin: 2px;
+    padding: 2px 4px;
     position: absolute;
     width: 300px;
-    height: 200px;
-    right: 20px;
+    height: 70px;
+    right: 30px;
     bottom: 20px;
     overflow: scroll;
-    box-shadow: 1px 1px 5px #000;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.3);
     background-color: white;
+    opacity: 0.8;
 }
 
 select {
