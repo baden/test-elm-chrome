@@ -4,7 +4,7 @@ module Types
         , Model
         , initModel
         , Msg(..)
-        , initPort
+          -- , initPort
         , OnScrollEvent
           -- , fakeLog
         , LogLine
@@ -12,11 +12,13 @@ module Types
         )
 
 import Serial
-import Time exposing (Time)
+import Date
 import Array exposing (Array)
-import Time exposing (Time)
+import Time
 
 
+-- import Time exposing (Time)
+-- import Time exposing (Time)
 -- import Dom
 
 
@@ -24,7 +26,7 @@ type alias Model =
     { uid : Int
     , portList : List Serial.Port
     , ports : List Port
-    , time : Time
+    , time : Time.Time
     , debug : String
     , logs : Array LogLine
     , shouldScroll : Bool
@@ -44,12 +46,12 @@ initModel =
         -- , logs = Array.fromList (List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!")
     , logs =
         -- List.range 1 999999
-        List.range 1 1000
+        List.range 1 10
             |> List.map
                 (\c ->
                     fakeLog
                         (c % 4)
-                        0
+                        (Date.fromTime 0)
                         ("Fake log #"
                             ++ (toString c)
                             ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
@@ -68,21 +70,25 @@ initModel =
 
 
 type alias Port =
-    { id : Int }
-
-
-initPort : Int -> Port
-initPort id =
-    { id = id
+    { id : Int
+    , logColor : String
     }
+
+
+
+-- initPort : Int -> Port
+-- initPort id =
+--     { id = id
+--     }
 
 
 type Msg
     = AddPort
     | RemovePort Int
-    | Tick Time
+    | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
     | AddLabel
+    | AddLogLine LogLine
     | ClearLog
     | NoOp
     | ChatScrolled OnScrollEvent
@@ -102,12 +108,12 @@ type Sender
 
 type alias LogLine =
     { data : String
-    , timestamp : Time
+    , timestamp : Date.Date
     , sender : Sender
     }
 
 
-fakeLog : Int -> Time -> String -> LogLine
+fakeLog : Int -> Date.Date -> String -> LogLine
 fakeLog id timestamp data =
     LogLine
         data

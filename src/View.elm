@@ -15,6 +15,11 @@ import Types
 import Serial
 import Update exposing (onScroll)
 import Array exposing (Array)
+import Date
+import Date.Format
+
+
+-- import Time
 
 
 control_view : Model -> Html Msg
@@ -42,6 +47,28 @@ control_view model =
           -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
         , button [ title "Настройки" ] [ text "🛠" ]
         ]
+
+
+
+-- Cmd.batch
+-- addLabel =
+--     let
+--         _ =
+--             Debug.log "click" 0
+--
+--         sender =
+--             LabelId 0
+--
+--         fakeDate =
+--             Date.fromTime 0
+--     in
+--         -- Task.sequence
+--         -- [ Task.perform AddLogLine Date.now
+--         --     |> Cmd.batch
+--         -- ]
+--         Task.succeed ( fakeDate, sender, "====" )
+--             |> Task.perform AddLogLine
+--             |> Cmd.batch
 
 
 toSelectOption : String -> Html a
@@ -110,7 +137,7 @@ port_view model port_ =
             ]
             [ input
                 [ type_ "color"
-                , value (getColor port_.id)
+                , value port_.logColor
                 ]
                 []
             ]
@@ -158,8 +185,15 @@ log_row l offset =
           --     )
         ]
         [ a [] [ text (toString (offset + 1)) ]
+        , span [ class "time" ] [ text (dateToTime l.timestamp) ]
+        , span [ class "delta" ] [ text "+0.142" ]
         , text l.data
         ]
+
+
+dateToTime : Date.Date -> String
+dateToTime date =
+    Date.Format.format "%H:%M:%S" date
 
 
 logClassName : LogLine -> String
@@ -320,35 +354,19 @@ stylesheet m =
         attrs =
             []
 
-        rule id =
+        rule p =
             "pre.log p[class^=\"port_"
-                ++ (toString id)
+                ++ (toString p.id)
                 ++ "\"] {"
                 ++ "color: "
-                ++ (getColor id)
+                ++ p.logColor
                 ++ ";}\n"
 
         rules =
             m.ports
-                |> List.map (\c -> rule c.id)
+                |> List.map (\p -> rule p)
                 |> String.concat
     in
         node tag
             attrs
             [ text rules ]
-
-
-getColor : Int -> String
-getColor i =
-    Array.get (i % Array.length portColors) portColors
-        |> Maybe.withDefault "black"
-
-
-portColors : Array String
-portColors =
-    Array.fromList
-        [ "#9F0000"
-        , "#00009F"
-        , "#9F009F"
-        , "#9F9F00"
-        ]

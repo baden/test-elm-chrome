@@ -11,18 +11,21 @@ import Serial
 import Types
     exposing
         ( Port
-        , initPort
+          -- , initPort
         , initModel
         , Model
         , Msg(..)
         , OnScrollEvent
+        , LogLine
+        , Sender(..)
         )
 import Dom.Scroll
 import Json.Decode
 import Html
 import Html.Events
 import Array exposing (Array)
-import Time exposing (Time)
+import Task
+import Date
 
 
 -- import Date
@@ -84,14 +87,12 @@ onScrollJsonParser =
 --
 --             Err _ ->
 --                 NoOp
-
-
-fakeLog : Time -> String -> Types.LogLine
-fakeLog timestamp data =
-    Types.LogLine
-        data
-        timestamp
-        (Types.LabelId 0)
+-- fakeLog : Time -> String -> Types.LogLine
+-- fakeLog timestamp data =
+--     Types.LogLine
+--         data
+--         timestamp
+--         (Types.LabelId 0)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -99,8 +100,11 @@ update msg model =
     case msg of
         AddPort ->
             let
+                id =
+                    model.uid
+
                 port_ =
-                    initPort model.uid
+                    Types.Port id (getColor id)
             in
                 { model
                     | uid = model.uid + 1
@@ -110,15 +114,18 @@ update msg model =
 
         AddLabel ->
             let
+                _ =
+                    Debug.log "AddLabel" 0
+            in
+                ( model, onClickAddLabel )
+
+        AddLogLine logLine ->
+            let
+                _ =
+                    Debug.log "AddLogLine" logLine
+
                 new_logs =
-                    -- "Label" :: model.logs
-                    -- Array.push "Label" model.logs
-                    Array.push
-                        (fakeLog
-                            0
-                            "==============================================="
-                        )
-                        model.logs
+                    Array.push logLine model.logs
             in
                 { model | logs = new_logs }
                     ! [ scrollToBottom ]
@@ -163,3 +170,48 @@ getSerialDevices =
     Serial.getDevices
         |> Task.perform
             SetSerialDevices
+
+
+getColor : Int -> String
+getColor i =
+    Array.get (i % Array.length portColors) portColors
+        |> Maybe.withDefault "black"
+
+
+portColors : Array String
+portColors =
+    Array.fromList
+        [ "#9F0000"
+        , "#00009F"
+        , "#9F009F"
+        , "#9F9F00"
+        ]
+
+
+onClickAddLabel : Cmd Msg
+onClickAddLabel =
+    let
+        fakeLogLine =
+            LogLine
+                "========================="
+                (Date.fromTime 0)
+                (LabelId 0)
+    in
+        -- Html.Attributes.on
+        -- Task.perform (a -> msg) Task.Task Basics.Never a
+        Date.now
+            |> Task.andThen
+                (\now ->
+                    let
+                        _ =
+                            Debug.log "andThen" now
+                    in
+                        Task.succeed fakeLogLine
+                )
+            |> Task.perform AddLogLine
+
+
+
+--
+--     |> Task.perform AddLogLine
+-- Cmd.batch [  ]

@@ -107,6 +107,24 @@ pre.log p a {
     font-weight: normal;
 }
 
+pre.log p span.time {
+    color: #888;
+    padding-left: 20px;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #ccc;
+}
+
+pre.log p span.delta {
+    display: inline-block;
+    text-align: right;
+    width: 100px;
+    color: #888;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #ccc;
+}
+
 /*pre.log p[class^="port_"] {
     color: red;
 }*/
