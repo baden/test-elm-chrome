@@ -113,7 +113,11 @@ update msg model =
                     ! []
 
         AddLabel ->
-            ( model, onClickAddLabel )
+            let
+                id =
+                    model.last_labelid + 1
+            in
+                ( { model | last_labelid = id }, onClickAddLabel id )
 
         AddLogLine logLine ->
             let
@@ -205,15 +209,15 @@ portColors =
         ]
 
 
-onClickAddLabel : Cmd Msg
-onClickAddLabel =
+onClickAddLabel : Int -> Cmd Msg
+onClickAddLabel id =
     Date.now
         |> Task.andThen
             (\now ->
                 let
                     fakeLogLine =
                         LogLine
-                            "========================="
+                            ("Метка 🖈" ++ (toString id))
                             now
                             0
                             (LabelId 0)

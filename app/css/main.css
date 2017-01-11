@@ -90,13 +90,23 @@ pre.log p {
     /*font-weight: bold;*/
     border: none;
 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* word-break: break-all; */
-    white-space: nowrap;
+    display: flex;
+    flex-direction: row;
 }
 
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
 pre.log p a {
+    position: relative;
     display: inline-block;
     text-align: right;
     min-width: 60px;
@@ -108,6 +118,7 @@ pre.log p a {
 }
 
 pre.log p span.time {
+    position: relative;
     color: #888;
     padding-left: 20px;
     padding-right: 10px;
@@ -116,9 +127,10 @@ pre.log p span.time {
 }
 
 pre.log p span.delta {
+    position: relative;
     display: inline-block;
     text-align: right;
-    width: 100px;
+    min-width: 100px;
     color: #888;
     padding-right: 10px;
     margin-right: 10px;
@@ -129,9 +141,51 @@ pre.log p span.delta {
     color: red;
 }*/
 
-pre.log p[class^="label_"] {
-    color: green;
+pre.log p span.content {
+    position: relative;
+    -webkit-flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* word-break: break-all; */
+    white-space: nowrap;
 }
+
+
+pre.log p[class^="label_"] span.content {
+    color: green;
+    /*text-align: center;*/
+}
+
+/*pre.log p[class^="label_"] span.content:before,
+pre.log p[class^="label_"] span.content:after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 9999px;
+    height: 2px;
+    background: #ddd;
+}
+
+pre.log p[class^="label_"] span.content:before {
+    right: 100%;
+    margin-right: 15px;
+}
+
+pre.log p[class^="label_"] span.content:after {
+    left: 100%;
+    margin-left: 15px;
+}*/
+
+pre.log p[class^="label_"] span.content:after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 0;
+    left: 102px;
+    height: 2px;
+    background: green;
+}
+
 
 a {
     color: #428bca;

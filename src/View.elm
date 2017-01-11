@@ -184,10 +184,12 @@ log_row l offset =
           --         ++ "px"
           --     )
         ]
-        [ a [] [ text (toString (offset + 1)) ]
-        , span [ class "time" ] [ text (dateToTime l.timestamp) ]
-        , span [ class "delta" ] [ text (deltaAsString l.delta) ]
-        , text l.data
+        [ div [ class "horizontal" ]
+            [ a [] [ text (toString (offset + 1)) ]
+            , span [ class "time" ] [ text (dateToTime l.timestamp) ]
+            , span [ class "delta" ] [ text (deltaAsString l.delta) ]
+            , span [ class "content" ] [ text l.data ]
+            ]
         ]
 
 

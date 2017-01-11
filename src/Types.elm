@@ -30,6 +30,7 @@ type alias Model =
     , debug : String
     , logs : Array LogLine
     , last_timestamp : Date.Date
+    , last_labelid : Int
     , shouldScroll : Bool
     , scrollEvent : OnScrollEvent
     }
@@ -60,6 +61,7 @@ initModel =
                 )
             |> Array.fromList
     , last_timestamp = Date.fromTime 0
+    , last_labelid = 0
     , shouldScroll = False
     , scrollEvent = OnScrollEvent 0 0 0
     }
