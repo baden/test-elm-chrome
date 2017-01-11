@@ -18,6 +18,7 @@ import Types
         , OnScrollEvent
         , LogLine
         , Sender(..)
+        , LabelType(..)
         )
 import Dom.Scroll
 import Json.Decode
@@ -112,12 +113,12 @@ update msg model =
                 }
                     ! []
 
-        AddLabel ->
+        AddLabel labelType ->
             let
                 id =
                     model.last_labelid + 1
             in
-                ( { model | last_labelid = id }, onClickAddLabel id )
+                ( { model | last_labelid = id }, onClickAddLabel labelType id )
 
         AddLogLine logLine ->
             let
@@ -209,15 +210,26 @@ portColors =
         ]
 
 
-onClickAddLabel : Int -> Cmd Msg
-onClickAddLabel id =
+onClickAddLabel : LabelType -> Int -> Cmd Msg
+onClickAddLabel labelType id =
     Date.now
         |> Task.andThen
             (\now ->
                 let
+                    labelChar =
+                        case labelType of
+                            LabelRegular ->
+                                "🖈"
+
+                            LabelGood ->
+                                "🙂"
+
+                            LabelBad ->
+                                "🙁"
+
                     fakeLogLine =
                         LogLine
-                            ("Метка 🖈" ++ (toString id))
+                            ("Метка " ++ labelChar ++ (toString id))
                             now
                             0
                             (LabelId 0)

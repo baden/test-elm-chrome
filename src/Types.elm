@@ -9,6 +9,7 @@ module Types
           -- , fakeLog
         , LogLine
         , Sender(..)
+        , LabelType(..)
         )
 
 import Serial
@@ -91,7 +92,7 @@ type Msg
     | RemovePort Int
     | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
-    | AddLabel
+    | AddLabel LabelType
     | AddLogLine LogLine
     | ClearLog
     | NoOp
@@ -116,6 +117,12 @@ type alias LogLine =
     , delta : Float
     , sender : Sender
     }
+
+
+type LabelType
+    = LabelRegular
+    | LabelGood
+    | LabelBad
 
 
 fakeLog : Int -> Date.Date -> String -> LogLine

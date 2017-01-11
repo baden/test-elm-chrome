@@ -10,6 +10,7 @@ import Types
         , initModel
         , Msg(..)
         , LogLine
+        , LabelType(..)
         , Sender(..)
         )
 import Serial
@@ -26,9 +27,9 @@ control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
         [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
-        , button [ title "Поставить метку", onClick AddLabel ] [ text "🖈" ]
-        , button [ title "Пометить как хорошее", class "good" ] [ text "🙂" ]
-        , button [ title "Пометить как плохое", class "bad" ] [ text "🙁" ]
+        , button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "🖈" ]
+        , button [ title "Пометить как хорошее", class "good", onClick (AddLabel LabelGood) ] [ text "🙂" ]
+        , button [ title "Пометить как плохое", class "bad", onClick (AddLabel LabelBad) ] [ text "🙁" ]
         , button [ title "К предыдущей метке" ] [ text "⏮" ]
         , button [ title "К следующей метке" ] [ text "⏭" ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
