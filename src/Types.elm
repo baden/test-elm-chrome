@@ -29,6 +29,7 @@ type alias Model =
     , time : Time.Time
     , debug : String
     , logs : Array LogLine
+    , last_timestamp : Date.Date
     , shouldScroll : Bool
     , scrollEvent : OnScrollEvent
     }
@@ -58,6 +59,7 @@ initModel =
                         )
                 )
             |> Array.fromList
+    , last_timestamp = Date.fromTime 0
     , shouldScroll = False
     , scrollEvent = OnScrollEvent 0 0 0
     }
@@ -109,6 +111,7 @@ type Sender
 type alias LogLine =
     { data : String
     , timestamp : Date.Date
+    , delta : Float
     , sender : Sender
     }
 
@@ -118,6 +121,7 @@ fakeLog id timestamp data =
     LogLine
         data
         timestamp
+        0
         (PortId id)
 
 

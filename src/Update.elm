@@ -113,21 +113,33 @@ update msg model =
                     ! []
 
         AddLabel ->
-            let
-                _ =
-                    Debug.log "AddLabel" 0
-            in
-                ( model, onClickAddLabel )
+            ( model, onClickAddLabel )
 
         AddLogLine logLine ->
             let
                 _ =
                     Debug.log "AddLogLine" logLine
 
+                prev_timestamp =
+                    dateToUnixtime model.last_timestamp
+
+                log_timestamp =
+                    dateToUnixtime logLine.timestamp
+
+                delta =
+                    log_timestamp - prev_timestamp
+
                 new_logs =
-                    Array.push logLine model.logs
+                    Array.push
+                        { logLine
+                            | delta = delta
+                        }
+                        model.logs
             in
-                { model | logs = new_logs }
+                { model
+                    | logs = new_logs
+                    , last_timestamp = logLine.timestamp
+                }
                     ! [ scrollToBottom ]
 
         ClearLog ->
@@ -164,6 +176,11 @@ update msg model =
 --         ( model, Cmd.none )
 
 
+dateToUnixtime : Date.Date -> Float
+dateToUnixtime date =
+    (Date.toTime date) / 1000
+
+
 getSerialDevices : Cmd Msg
 getSerialDevices =
     -- Time.now
@@ -190,25 +207,20 @@ portColors =
 
 onClickAddLabel : Cmd Msg
 onClickAddLabel =
-    let
-        fakeLogLine =
-            LogLine
-                "========================="
-                (Date.fromTime 0)
-                (LabelId 0)
-    in
-        -- Html.Attributes.on
-        -- Task.perform (a -> msg) Task.Task Basics.Never a
-        Date.now
-            |> Task.andThen
-                (\now ->
-                    let
-                        _ =
-                            Debug.log "andThen" now
-                    in
-                        Task.succeed fakeLogLine
-                )
-            |> Task.perform AddLogLine
+    Date.now
+        |> Task.andThen
+            (\now ->
+                let
+                    fakeLogLine =
+                        LogLine
+                            "========================="
+                            now
+                            0
+                            (LabelId 0)
+                in
+                    Task.succeed fakeLogLine
+            )
+        |> Task.perform AddLogLine
 
 
 

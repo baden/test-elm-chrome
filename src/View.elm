@@ -186,7 +186,7 @@ log_row l offset =
         ]
         [ a [] [ text (toString (offset + 1)) ]
         , span [ class "time" ] [ text (dateToTime l.timestamp) ]
-        , span [ class "delta" ] [ text "+0.142" ]
+        , span [ class "delta" ] [ text (deltaAsString l.delta) ]
         , text l.data
         ]
 
@@ -194,6 +194,28 @@ log_row l offset =
 dateToTime : Date.Date -> String
 dateToTime date =
     Date.Format.format "%H:%M:%S" date
+
+
+deltaAsString : Float -> String
+deltaAsString d =
+    let
+        _ =
+            Debug.log "d" d
+
+        hi =
+            floor d
+
+        lo =
+            (round (d * 1000)) % 1000
+
+        loStr =
+            toString lo
+                |> String.padLeft 3 '0'
+    in
+        if d > 1000000 then
+            "+?"
+        else
+            "+" ++ (toString hi) ++ "." ++ loStr
 
 
 logClassName : LogLine -> String
