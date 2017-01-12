@@ -23,19 +23,25 @@ import Date.Format
 -- import Time
 
 
+toLeftGroup : Html.Attribute msg
+toLeftGroup =
+    style [ ( "margin-left", "-3px" ) ]
+
+
 control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
         [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
         , button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "🖈" ]
-        , button [ title "Пометить как хорошее", class "good", onClick (AddLabel LabelGood) ] [ text "🙂" ]
-        , button [ title "Пометить как плохое", class "bad", onClick (AddLabel LabelBad) ] [ text "🙁" ]
+        , button [ title "Пометить как хорошее", class "good", toLeftGroup, onClick (AddLabel LabelGood) ] [ text "🙂" ]
+        , button [ title "Пометить как плохое", class "bad", toLeftGroup, onClick (AddLabel LabelBad) ] [ text "🙁" ]
         , button [ title "К предыдущей метке" ] [ text "⏮" ]
-        , button [ title "К следующей метке" ] [ text "⏭" ]
+        , button [ title "К следующей метке", toLeftGroup ] [ text "⏭" ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
         , button [ title "Отключить автопрокрутку окна лога" ] [ text "⏸" ]
-        , button [ title "Включить автопрокрутку окна лога", disabled True, class "active" ] [ text "⏵" ]
+        , button [ title "Включить автопрокрутку окна лога", disabled True, class "active", toLeftGroup ] [ text "⏵" ]
         , button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
+        , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
         , button [ title "Запись лога в облако" ] [ text "🌍" ]
         , span [ class "find" ]
             [ text "🔍"
@@ -130,7 +136,12 @@ port_view model port_ =
     div [ class "port" ]
         [ select [] (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
-        , button [ title "Подключить порт и начать запись лога", style [ ( "color", "#a00" ) ] ] [ text "⏺" ]
+        , button
+            [ title "Подключить порт и начать запись лога"
+            , style [ ( "color", "#a00" ) ]
+            , onClick (ConnectPort port_)
+            ]
+            [ text "⏺" ]
         , button [ title "Остановить запись лога и отключить порт", disabled True, class "active" ] [ text "⏹" ]
         , button
             [ class "colorpicker"
@@ -202,9 +213,6 @@ dateToTime date =
 deltaAsString : Float -> String
 deltaAsString d =
     let
-        _ =
-            Debug.log "d" d
-
         hi =
             floor d
 
@@ -290,7 +298,6 @@ log_view model =
             [ class "log"
             , id "log"
             , onScroll ChatScrolled
-            , onScroll ChatScrolled
             ]
             [ sliceLog start stop model.logs
                 |> pre
@@ -342,7 +349,7 @@ debug_view : Model -> Html Msg
 debug_view model =
     div [ class "debug" ]
         [ debug_scroll_view model
-          -- , p [] [ text (toString model) ]
+        , p [] [ text (toString model.ports) ]
         ]
 
 

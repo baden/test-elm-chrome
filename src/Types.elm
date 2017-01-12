@@ -76,6 +76,8 @@ initModel =
 
 type alias Port =
     { id : Int
+    , path : String
+    , name : String
     , logColor : String
     }
 
@@ -90,6 +92,8 @@ type alias Port =
 type Msg
     = AddPort
     | RemovePort Int
+    | ConnectPort Port
+    | OnPortMessage String
     | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
     | AddLabel LabelType
@@ -97,6 +101,7 @@ type Msg
     | ClearLog
     | NoOp
     | ChatScrolled OnScrollEvent
+    | Wtf String
 
 
 type alias OnScrollEvent =

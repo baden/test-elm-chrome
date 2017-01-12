@@ -295,8 +295,8 @@ button.bad {
 
 button:hover:enabled, select:hover:enabled {
     /*background: #eee;*/
-    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.2);
-    border: 1px solid #444;
+    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.5);
+    /*border: 1px solid #444;*/
 }
 
 :focus {

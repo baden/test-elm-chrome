@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (Html)
-import Types exposing (Model, Msg(..))
-import Update exposing (init, update)
+import Types exposing (Model, Msg)
+import Update exposing (init, update, subscriptions)
 import View exposing (view)
 
 
@@ -14,8 +14,3 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none

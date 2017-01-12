@@ -2,6 +2,7 @@ module Update
     exposing
         ( init
         , update
+        , subscriptions
         , onScroll
         , onResize
         )
@@ -105,7 +106,7 @@ update msg model =
                     model.uid
 
                 port_ =
-                    Types.Port id (getColor id)
+                    Types.Port id "" " " (getColor id)
             in
                 { model
                     | uid = model.uid + 1
@@ -151,6 +152,24 @@ update msg model =
             { model | logs = Array.empty }
                 ! [ scrollToBottom ]
 
+        ConnectPort port_ ->
+            let
+                _ =
+                    Debug.log "Connect" port_
+
+                -- s =
+                --     Debug.log "Open"
+                --         (Serial.open "my_path" OnPortMessage)
+            in
+                model ! []
+
+        OnPortMessage line ->
+            let
+                _ =
+                    Debug.log "On port message" line
+            in
+                model ! []
+
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
                 ! []
@@ -167,6 +186,13 @@ update msg model =
                 , scrollEvent = event
             }
                 ! []
+
+        Wtf line ->
+            let
+                _ =
+                    Debug.log "Wtf" line
+            in
+                model ! []
 
         NoOp ->
             model ! []
@@ -243,3 +269,13 @@ onClickAddLabel labelType id =
 --
 --     |> Task.perform AddLogLine
 -- Cmd.batch [  ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    let
+        _ =
+            Debug.log "subscriptions" model.debug
+    in
+        -- Serial.listen "my_path" OnPortMessage
+        Sub.none
