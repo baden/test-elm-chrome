@@ -1,8 +1,8 @@
 module Serial.LowLevel
     exposing
         ( Serial
-        , open
-        , BadOpen(..)
+        , waitMessage
+          -- , BadOpen(..)
         )
 
 import Native.Serial
@@ -33,15 +33,16 @@ type alias Settings =
     }
 
 
-type BadOpen
-    = BadSecurity
-    | BadArgs
 
-
-
+-- type BadOpen
+--     = BadSecurity
+--     | BadArgs
 -- open : String -> (String -> msg) -> Task x Serial
 
 
-open : String -> Settings -> Task BadOpen Serial
-open =
-    Native.Serial.open
+waitMessage :
+    (String -> Task Never ())
+    -> (a -> Task Never ())
+    -> Task x Serial
+waitMessage =
+    Native.Serial.waitMessage

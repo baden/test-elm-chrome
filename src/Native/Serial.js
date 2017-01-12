@@ -80,15 +80,17 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     //     });
     // }
 
-    var serial = chrome.serial;
-    var open = function(path, settings) {
-        console.log("open", [path, settings]);
+    // var serial = chrome.serial;
+    var waitMessage = function(onMessageTask) {
+        console.log("+> waitMessage", [onMessageTask]);
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
             console.log("open:binding", [callback]);
             var id = setInterval(function(){
                 console.log("open:binding:interval", [callback]);
+                // onMessageTask
                 var data = "Fake string";
-                _elm_lang$core$Native_Scheduler.rawSpawn(A2(settings.onMessage, id, data));
+                var task = onMessageTask(data);
+                _elm_lang$core$Native_Scheduler.rawSpawn(task);
             }, 10000);
 
             // TODO
@@ -116,7 +118,8 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         // loadTime: loadTime
         loadTime: (new window.Date).getTime(),
         addOne: addOne,
-        open: F2(open),
+        // waitMessage: F2(waitMessage),
+        waitMessage: F2(waitMessage),
         // set: set,
         getDevices: getDevices
         // getDevices: F2(getDevices)

@@ -101,7 +101,6 @@ type Msg
     | ClearLog
     | NoOp
     | ChatScrolled OnScrollEvent
-    | Wtf String
 
 
 type alias OnScrollEvent =

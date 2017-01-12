@@ -6,17 +6,17 @@ effect module Serial
         , set
         , getDevices
         , Port
-        , open
-        , listen
+          -- , open
+        , messages
         )
 
 -- import Native.Serial
 
 import Task exposing (Task)
 import Serial.LowLevel as SLL
+import Process
 
 
--- import Process
 -- this will be our function which returns a number plus one
 -- addOne a =
 --     a + 1
@@ -63,28 +63,26 @@ getDevices =
 
 
 type MySub msg
-    = Listen String (String -> msg)
-
-
-open :
-    String
-    -> Platform.Router msg Msg
-    -> Task SLL.BadOpen SLL.Serial
-open path router =
-    SLL.open path
-        { onMessage = \_ msg -> Platform.sendToSelf router (Receive path msg)
-        }
+    = Message (String -> msg)
 
 
 
+-- open :
+--     String
+--     -> Platform.Router msg Msg
+--     -> Task SLL.BadOpen SLL.Serial
+-- open path router =
+--     SLL.open path
+--         { onMessage = \_ msg -> Platform.sendToSelf router (Receive path msg)
+--         }
 -- open : String -> (String -> msg) -> Task x SLL.Serial
 -- open =
 --     SLL.open
 
 
-listen : String -> (String -> msg) -> Sub msg
-listen path tagger =
-    subscription (Listen path tagger)
+messages : (String -> msg) -> Sub msg
+messages tagger =
+    subscription (Message tagger)
 
 
 
@@ -100,14 +98,14 @@ type alias Event =
 
 
 subMap : (a -> b) -> MySub a -> MySub b
-subMap func sub =
-    let
-        _ =
-            Debug.log "Serial:subMap" ( func, sub )
-    in
-        case sub of
-            Listen path tagger ->
-                Listen path (tagger >> func)
+subMap func (Message tagger) =
+    -- let
+    --     _ =
+    --         Debug.log "Serial:subMap" ( func, tagger )
+    -- in
+    --     -- case sub of
+    --     --     Message tagger ->
+    Message (tagger >> func)
 
 
 
@@ -117,6 +115,7 @@ subMap func sub =
 type alias State msg =
     Maybe
         { subs : List (MySub msg)
+        , listener : Process.Id
         }
 
 
@@ -130,20 +129,39 @@ init =
 
 
 onSelfMsg :
-    Platform.Router msg Msg
-    -> Msg
+    Platform.Router msg String
+    -> String
     -> State msg
     -> Task Never (State msg)
 onSelfMsg router selfMsg state =
     let
         _ =
-            Debug.log "Serial:onSelfMsg" ( router, selfMsg, state )
+            Debug.log "Serial:onSelfMsg" 0
+
+        _ =
+            Debug.log "     router" router
+
+        _ =
+            Debug.log "    selfMsg" selfMsg
+
+        _ =
+            Debug.log "     state" state
     in
-        Task.succeed state
+        case state of
+            Nothing ->
+                Task.succeed Nothing
+
+            Just { subs } ->
+                let
+                    send (Message tagger) =
+                        Platform.sendToApp router (tagger selfMsg)
+                in
+                    Task.sequence (List.map send subs)
+                        |> Task.andThen (\_ -> Task.succeed state)
 
 
 onEffects :
-    Platform.Router msg Msg
+    Platform.Router msg String
     -> List (MyCmd msg)
     -> List (MySub msg)
     -> State msg
@@ -151,6 +169,37 @@ onEffects :
 onEffects router cmds subs state =
     let
         _ =
-            Debug.log "Serial:onEffects" ( router, cmds, subs, state )
+            Debug.log "Serial:onEffects" 0
+
+        _ =
+            Debug.log "     router" router
+
+        _ =
+            Debug.log "     cmds" cmds
+
+        _ =
+            Debug.log "     subs" subs
+
+        _ =
+            Debug.log "     state" state
     in
-        Task.succeed Nothing
+        case state of
+            Nothing ->
+                case subs of
+                    [] ->
+                        Task.succeed state
+
+                    _ ->
+                        Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
+                            |> Task.andThen
+                                (\listener ->
+                                    Task.succeed (Just { subs = subs, listener = listener })
+                                )
+
+            -- Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
+            --     |> Task.andThen
+            --         (\listener ->
+            --             Task.succeed (Just { subs = subs, listener = listener })
+            --         )
+            Just { subs, listener } ->
+                Task.succeed state

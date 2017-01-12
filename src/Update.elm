@@ -168,7 +168,7 @@ update msg model =
                 _ =
                     Debug.log "On port message" line
             in
-                model ! []
+                model ! [ addPortMsg line ]
 
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
@@ -186,13 +186,6 @@ update msg model =
                 , scrollEvent = event
             }
                 ! []
-
-        Wtf line ->
-            let
-                _ =
-                    Debug.log "Wtf" line
-            in
-                model ! []
 
         NoOp ->
             model ! []
@@ -265,6 +258,24 @@ onClickAddLabel labelType id =
         |> Task.perform AddLogLine
 
 
+addPortMsg : String -> Cmd Msg
+addPortMsg text =
+    Date.now
+        |> Task.andThen
+            (\now ->
+                let
+                    fakeLogLine =
+                        LogLine
+                            text
+                            now
+                            0
+                            (PortId 0)
+                in
+                    Task.succeed fakeLogLine
+            )
+        |> Task.perform AddLogLine
+
+
 
 --
 --     |> Task.perform AddLogLine
@@ -277,5 +288,8 @@ subscriptions model =
         _ =
             Debug.log "subscriptions" model.debug
     in
-        -- Serial.listen "my_path" OnPortMessage
-        Sub.none
+        Serial.messages OnPortMessage
+
+
+
+-- Sub.none
