@@ -28,6 +28,7 @@ import Html.Events
 import Array exposing (Array)
 import Task
 import Date
+import Serial.LowLevel as SLL
 
 
 -- import Date
@@ -163,12 +164,12 @@ update msg model =
             in
                 model ! []
 
-        OnPortMessage line ->
+        OnPortMessage ev_line ->
             let
                 _ =
-                    Debug.log "On port message" line
+                    Debug.log "On port message" ev_line
             in
-                model ! [ addPortMsg line ]
+                model ! [ addPortMsg ev_line.data ]
 
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }

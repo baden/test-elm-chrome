@@ -63,7 +63,7 @@ getDevices =
 
 
 type MySub msg
-    = Message (String -> msg)
+    = Message (SLL.Event -> msg)
 
 
 
@@ -80,7 +80,7 @@ type MySub msg
 --     SLL.open
 
 
-messages : (String -> msg) -> Sub msg
+messages : (SLL.Event -> msg) -> Sub msg
 messages tagger =
     subscription (Message tagger)
 
@@ -129,8 +129,8 @@ init =
 
 
 onSelfMsg :
-    Platform.Router msg String
-    -> String
+    Platform.Router msg SLL.Event
+    -> SLL.Event
     -> State msg
     -> Task Never (State msg)
 onSelfMsg router selfMsg state =
@@ -161,7 +161,7 @@ onSelfMsg router selfMsg state =
 
 
 onEffects :
-    Platform.Router msg String
+    Platform.Router msg SLL.Event
     -> List (MyCmd msg)
     -> List (MySub msg)
     -> State msg

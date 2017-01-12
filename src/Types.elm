@@ -16,6 +16,7 @@ import Serial
 import Date
 import Array exposing (Array)
 import Time
+import Serial.LowLevel as SLL
 
 
 -- import Time exposing (Time)
@@ -93,7 +94,7 @@ type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
-    | OnPortMessage String
+    | OnPortMessage SLL.Event
     | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
     | AddLabel LabelType

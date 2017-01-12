@@ -88,7 +88,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
             var id = setInterval(function(){
                 console.log("open:binding:interval", [callback]);
                 // onMessageTask
-                var data = "Fake string";
+                var data = {id: 42, data: "Fake string"};
                 var task = onMessageTask(data);
                 _elm_lang$core$Native_Scheduler.rawSpawn(task);
             }, 10000);

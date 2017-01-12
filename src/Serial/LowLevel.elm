@@ -2,6 +2,7 @@ module Serial.LowLevel
     exposing
         ( Serial
         , waitMessage
+        , Event
           -- , BadOpen(..)
         )
 
@@ -18,7 +19,7 @@ type Serial
 
 
 type alias Event =
-    { path : String
+    { id : Int
     , data : String
     }
 
@@ -41,7 +42,7 @@ type alias Settings =
 
 
 waitMessage :
-    (String -> Task Never ())
+    (Event -> Task Never ())
     -> (a -> Task Never ())
     -> Task x Serial
 waitMessage =
