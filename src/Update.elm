@@ -28,7 +28,6 @@ import Html.Events
 import Array exposing (Array)
 import Task
 import Date
-import Serial.LowLevel as SLL
 
 
 -- import Date
@@ -169,7 +168,7 @@ update msg model =
                 _ =
                     Debug.log "On port message" ev_line
             in
-                model ! [ addPortMsg ev_line.data ]
+                model ! [ addPortMsg ev_line.id ev_line.data ]
 
         RemovePort id ->
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
@@ -259,18 +258,18 @@ onClickAddLabel labelType id =
         |> Task.perform AddLogLine
 
 
-addPortMsg : String -> Cmd Msg
-addPortMsg text =
+addPortMsg : Int -> String -> Cmd Msg
+addPortMsg id text =
     Date.now
         |> Task.andThen
             (\now ->
                 let
                     fakeLogLine =
                         LogLine
-                            text
+                            (text ++ (toString id))
                             now
                             0
-                            (PortId 0)
+                            (PortId id)
                 in
                     Task.succeed fakeLogLine
             )
