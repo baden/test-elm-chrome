@@ -157,6 +157,19 @@ onSelfMsg router selfMsg state =
                             Task.sequence (List.map send subs)
                                 |> Task.andThen (\_ -> Task.succeed state)
 
+            ReceiveError event ->
+                case state of
+                    Nothing ->
+                        Task.succeed Nothing
+
+                    Just { subs } ->
+                        let
+                            send (Message tagger) =
+                                Platform.sendToApp router (tagger event)
+                        in
+                            Task.sequence (List.map send subs)
+                                |> Task.andThen (\_ -> Task.succeed state)
+
 
 onEffects :
     Platform.Router msg Msg
@@ -199,15 +212,26 @@ onEffects router cmds subs state =
 
 type Msg
     = Receive SLL.Event
+    | ReceiveError SLL.Event
 
 
 waiter : Platform.Router msg Msg -> Task x SLL.Serial
 waiter router =
     SLL.waitMessage
-        (\msg ->
-            let
-                _ =
-                    Debug.log "waiter Msg: " msg
-            in
-                Platform.sendToSelf router (Receive msg)
-        )
+        { onReceive =
+            (\msg ->
+                let
+                    _ =
+                        Debug.log "waiter Receive Msg: " msg
+                in
+                    Platform.sendToSelf router (Receive msg)
+            )
+        , onReceiveError =
+            (\msg ->
+                let
+                    _ =
+                        Debug.log "waiter ReceiveError Msg: " msg
+                in
+                    Platform.sendToSelf router (ReceiveError msg)
+            )
+        }

@@ -26,9 +26,9 @@ type alias Event =
 
 type alias Settings =
     { onReceive :
-        { id : Int, data : String } -> Task Never ()
+        Event -> Task Never ()
     , onReceiveError :
-        { id : Int, data : String } -> Task Never ()
+        Event -> Task Never ()
     }
 
 
@@ -40,7 +40,7 @@ type alias Settings =
 
 
 waitMessage :
-    (Event -> Task Never ())
+    Settings
     -> Task x Serial
 waitMessage =
     Native.Serial.waitMessage

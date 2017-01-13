@@ -81,17 +81,24 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     // }
 
     // var serial = chrome.serial;
-    var waitMessage = function(onMessageTask, p2) {
-        console.log("+> waitMessage", [onMessageTask, p2]);
+    var waitMessage = function(settings) {
+        console.log("+> waitMessage", [settings]);
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
             // console.log("open:binding", [callback]);
             var id = setInterval(function(){
-                // console.log("open:binding:interval", [callback]);
-                // onMessageTask
+                console.log("Fake Receive Task");
                 var data = {id: 42, data: "Fake string"};
-                var task = onMessageTask(data);
+                var task = settings.onReceive(data);
                 _elm_lang$core$Native_Scheduler.rawSpawn(task);
             }, 10000);
+
+            var id = setInterval(function(){
+                // console.log("open:binding:interval", [callback]);
+                console.log("Fake ReceiveError Task");
+                var data = {id: 42, data: "Fake error string"};
+                var task = settings.onReceiveError(data);
+                _elm_lang$core$Native_Scheduler.rawSpawn(task);
+            }, 20000);
 
             // TODO
             // socket.addEventListener("close", function(event) {
