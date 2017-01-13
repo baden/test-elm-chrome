@@ -207,6 +207,6 @@ waiter router =
                 _ =
                     Debug.log "waiter Msg: " msg
             in
-                Platform.sendToSelf router msg
+                Platform.sendToSelf router (Receive msg)
         )
         (\_ -> Task.succeed ())
