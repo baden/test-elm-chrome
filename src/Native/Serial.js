@@ -119,7 +119,8 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         loadTime: (new window.Date).getTime(),
         addOne: addOne,
         // waitMessage: F2(waitMessage),
-        waitMessage: F2(waitMessage),
+        // waitMessage: F2(waitMessage),
+        waitMessage: waitMessage,
         // set: set,
         getDevices: getDevices
         // getDevices: F2(getDevices)

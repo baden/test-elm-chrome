@@ -41,7 +41,6 @@ type alias Settings =
 
 waitMessage :
     (Event -> Task Never ())
-    -> (a -> Task Never ())
     -> Task x Serial
 waitMessage =
     Native.Serial.waitMessage

@@ -32,10 +32,6 @@ cmdMap _ (Send url msg) =
     Send url msg
 
 
-type Msg
-    = Receive String String
-
-
 type alias Port =
     { displayName : String
     , path : String
@@ -129,8 +125,8 @@ init =
 
 
 onSelfMsg :
-    Platform.Router msg SLL.Event
-    -> SLL.Event
+    Platform.Router msg Msg
+    -> Msg
     -> State msg
     -> Task Never (State msg)
 onSelfMsg router selfMsg state =
@@ -147,21 +143,23 @@ onSelfMsg router selfMsg state =
                 )
                 0
     in
-        case state of
-            Nothing ->
-                Task.succeed Nothing
+        case selfMsg of
+            Receive event ->
+                case state of
+                    Nothing ->
+                        Task.succeed Nothing
 
-            Just { subs } ->
-                let
-                    send (Message tagger) =
-                        Platform.sendToApp router (tagger selfMsg)
-                in
-                    Task.sequence (List.map send subs)
-                        |> Task.andThen (\_ -> Task.succeed state)
+                    Just { subs } ->
+                        let
+                            send (Message tagger) =
+                                Platform.sendToApp router (tagger event)
+                        in
+                            Task.sequence (List.map send subs)
+                                |> Task.andThen (\_ -> Task.succeed state)
 
 
 onEffects :
-    Platform.Router msg SLL.Event
+    Platform.Router msg Msg
     -> List (MyCmd msg)
     -> List (MySub msg)
     -> State msg
@@ -199,7 +197,11 @@ onEffects router cmds subs state =
             Task.succeed state
 
 
-waiter : Platform.Router a SLL.Event -> Task x SLL.Serial
+type Msg
+    = Receive SLL.Event
+
+
+waiter : Platform.Router msg Msg -> Task x SLL.Serial
 waiter router =
     SLL.waitMessage
         (\msg ->
@@ -209,4 +211,3 @@ waiter router =
             in
                 Platform.sendToSelf router (Receive msg)
         )
-        (\_ -> Task.succeed ())
