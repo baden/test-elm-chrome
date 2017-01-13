@@ -1,17 +1,14 @@
-
+/*jslint camelcase: false*/
 var _baden$test_elm_chrome$Native_Serial = function() {
     // console.log("_baden$test_elm_chrome$Native_Serial");
 
-    function Cons(hd, tl)
-    {
-    	return { ctor: '::', _0: hd, _1: tl };
+    function Cons(hd, tl) {
+        return { ctor: '::', _0: hd, _1: tl };
     }
 
-    function fromArray(arr)
-    {
-    	var out = { ctor: '[]' };
-    	for (var i = arr.length; i--; )
-    	{
+    function fromArray(arr) {
+        var out = { ctor: '[]' };
+        for(var i = arr.length; i--;) {
     		out = Cons(arr[i], out);
     	}
     	return out;
@@ -21,19 +18,14 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
         chrome.serial.getDevices(function(ports){
             var elmPorts = ports.map(function(port) {
-                var displayName = port.displayName || "";
-                return {displayName, path: port.path};
+                return {
+                    displayName: port.displayName || "",
+                    path: port.path
+                };
             });
             callback(_elm_lang$core$Native_Scheduler.succeed(fromArray(elmPorts)));
         });
     });
-
-    // var open = function(path, onMessage) {
-    //     return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-    //         var serial = chrome.serial;
-    //
-    //     });
-    // }
 
     var waitMessage = function(settings) {
         console.log("+> waitMessage", [settings]);
@@ -61,15 +53,33 @@ var _baden$test_elm_chrome$Native_Serial = function() {
             return function() {
                 console.log("close");
                 // clearInterval(id);
-            }
+            };
 
         });
-    }
+    };
+
+    var connect = function (time) {
+        console.log("connect", time);
+        return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+            console.log("connect-start", time);
+            var id = setTimeout(function() {
+                // var ret = _elm_lang$core$Native_Utils.Tuple0;
+                var ret = 42;
+                callback(_elm_lang$core$Native_Scheduler.succeed(ret));
+            }, 3000);
+
+            return function() {
+                console.log("cancel");
+                clearTimeout(id);
+            };
+        });
+    };
 
     return {
         // waitMessage: F2(waitMessage),
         waitMessage: waitMessage,
-        getDevices: getDevices
+        getDevices: getDevices,
+        connect: connect
         // getDevices: F2(getDevices)
     };
 

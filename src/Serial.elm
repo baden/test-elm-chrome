@@ -3,6 +3,7 @@ effect module Serial
     exposing
         ( getDevices
         , Port
+        , connect
         , messages
         )
 
@@ -176,3 +177,17 @@ waiter router =
                     Platform.sendToSelf router (ReceiveError msg)
             )
         }
+
+
+
+-- connect : String -> Task x Int
+-- connect =
+--     SLL.connect
+-- connect : String -> Task x Int
+-- connect path =
+--     Native.Serial.connect
+
+
+connect : String -> Task x Int
+connect =
+    Native.Serial.connect

@@ -67,6 +67,7 @@ type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
+    | PortConnected Int
     | OnChangeColorEvent Int String
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event

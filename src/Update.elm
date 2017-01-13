@@ -30,6 +30,7 @@ import Task
 import Date
 
 
+-- import Process
 -- import Date
 -- import Html.Attributes
 -- import Dom
@@ -169,6 +170,13 @@ update msg model =
                 --     Debug.log "Open"
                 --         (Serial.open "my_path" OnPortMessage)
             in
+                model ! [ connectPort port_.path PortConnected ]
+
+        PortConnected id ->
+            let
+                _ =
+                    Debug.log "Port connected" id
+            in
                 model ! []
 
         OnChangeColorEvent port_id value ->
@@ -222,7 +230,28 @@ update msg model =
             model ! []
 
 
+connectPort : String -> (Int -> msg) -> Cmd msg
+connectPort path target =
+    -- Task.succeed 42
+    -- Process.sleep 3000
+    Serial.connect path
+        -- Serial.connect path
+        |>
+            Task.andThen
+                (\b ->
+                    let
+                        _ =
+                            Debug.log "then" b
+                    in
+                        Task.succeed 7
+                )
+        |> Task.perform target
 
+
+
+-- Native.Scheduler.spawn (Serial.connect path PortConnected)
+-- Serial.connect path
+--     |> Task.perform PortConnected
 -- DomError err ->
 --     let
 --         _ =
