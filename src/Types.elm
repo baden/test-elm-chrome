@@ -94,7 +94,8 @@ type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
-    | OnPortMessage SLL.Event
+    | OnPortReceive SLL.Event
+    | OnPortReceiveError SLL.Event
     | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
     | AddLabel LabelType

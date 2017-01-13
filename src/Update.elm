@@ -163,10 +163,17 @@ update msg model =
             in
                 model ! []
 
-        OnPortMessage ev_line ->
+        OnPortReceive ev_line ->
             let
                 _ =
                     Debug.log "On port message" ev_line
+            in
+                model ! [ addPortMsg ev_line.id ev_line.data ]
+
+        OnPortReceiveError ev_line ->
+            let
+                _ =
+                    Debug.log "On port error message" ev_line
             in
                 model ! [ addPortMsg ev_line.id ev_line.data ]
 
@@ -258,6 +265,10 @@ onClickAddLabel labelType id =
         |> Task.perform AddLogLine
 
 
+
+-- TODO: Тут можно будет сразу передавать таймштамп
+
+
 addPortMsg : Int -> String -> Cmd Msg
 addPortMsg id text =
     Date.now
@@ -288,7 +299,7 @@ subscriptions model =
     --     _ =
     --         Debug.log "subscriptions" model.debug
     -- in
-    Serial.messages OnPortMessage
+    Serial.messages OnPortReceive
 
 
 
