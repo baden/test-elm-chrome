@@ -17,27 +17,13 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     	return out;
     }
 
-    var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-        // Fake ports for eazy debug
-        if(!chrome || !chrome.serial) {
-            var elmPorts = [{displayName : "Эмуляция!", path: "/dev/ttyUSB0"}
-                , {displayName : "Эмуляция!", path: "/dev/ttyUSB1"}
-                , {displayName : "Эмуляция!", path: "/dev/ttyUSB2"}
-                , {displayName : "Эмуляция!", path: "/dev/ttyUSB3"}
-            ];
-            console.log("fake ports=", elmPorts);
-            callback(_elm_lang$core$Native_Scheduler.succeed(fromArray(elmPorts)));
 
-            return;
-        }
+    var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
         chrome.serial.getDevices(function(ports){
-            console.log("ports=", ports);
             var elmPorts = ports.map(function(port) {
                 var displayName = port.displayName || "";
                 return {displayName, path: port.path};
             });
-
-            // callback(_elm_lang$core$Native_Scheduler.succeed([Date.now()]));
             callback(_elm_lang$core$Native_Scheduler.succeed(fromArray(elmPorts)));
         });
     });
@@ -49,40 +35,32 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     //     });
     // }
 
-    // var serial = chrome.serial;
     var waitMessage = function(settings) {
         console.log("+> waitMessage", [settings]);
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
             // console.log("open:binding", [callback]);
-            var id = setInterval(function(){
-                console.log("Fake Receive Task");
-                var data = {id: 42, data: "Fake string"};
+
+            chrome.serial.onReceive.addListener(function(info){
+                console.log("port on receive", [info]);
+                var data = {id: 1, data: "Fake string"};
                 var task = settings.onReceive(data);
                 _elm_lang$core$Native_Scheduler.rawSpawn(task);
-            }, 10000);
+            });
 
-            var id = setInterval(function(){
-                // console.log("open:binding:interval", [callback]);
-                console.log("Fake ReceiveError Task");
-                var data = {id: 42, data: "Fake error string"};
+            chrome.serial.onReceiveError.addListener(function(info){
+                console.log("port on receiveError", [info]);
+                var data = {id: 2, data: "Fake error string"};
                 var task = settings.onReceiveError(data);
                 _elm_lang$core$Native_Scheduler.rawSpawn(task);
-            }, 20000);
 
-            // TODO
-            // socket.addEventListener("close", function(event) {
-            // 			_elm_lang$core$Native_Scheduler.rawSpawn(settings.onClose({
-            // 				code: event.code,
-            // 				reason: event.reason,
-            // 				wasClean: event.wasClean
-            // 			}));
-            // 		});
+            });
 
-            callback(_elm_lang$core$Native_Scheduler.succeed(id));
+            // What i must return?
+            callback(_elm_lang$core$Native_Scheduler.succeed(42));
 
             return function() {
                 console.log("close");
-                clearInterval(id);
+                // clearInterval(id);
             }
 
         });
