@@ -58,10 +58,8 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         });
     };
 
-    var connect = function (time) {
-        console.log("connect", time);
+    var connect = function (path) {
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-            console.log("connect-start", time);
             var id = setTimeout(function() {
                 // var ret = _elm_lang$core$Native_Utils.Tuple0;
                 var ret = 42;
@@ -69,7 +67,6 @@ var _baden$test_elm_chrome$Native_Serial = function() {
             }, 3000);
 
             return function() {
-                console.log("cancel");
                 clearTimeout(id);
             };
         });

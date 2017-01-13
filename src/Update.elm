@@ -170,7 +170,7 @@ update msg model =
                 --     Debug.log "Open"
                 --         (Serial.open "my_path" OnPortMessage)
             in
-                model ! [ connectPort port_.path PortConnected ]
+                model ! [ Serial.connect port_.path PortConnected ]
 
         PortConnected id ->
             let
@@ -228,24 +228,6 @@ update msg model =
 
         NoOp ->
             model ! []
-
-
-connectPort : String -> (Int -> msg) -> Cmd msg
-connectPort path target =
-    -- Task.succeed 42
-    -- Process.sleep 3000
-    Serial.connect path
-        -- Serial.connect path
-        |>
-            Task.andThen
-                (\b ->
-                    let
-                        _ =
-                            Debug.log "then" b
-                    in
-                        Task.succeed 7
-                )
-        |> Task.perform target
 
 
 

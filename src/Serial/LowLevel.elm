@@ -1,6 +1,7 @@
 module Serial.LowLevel
     exposing
         ( Serial
+        , connect
         , waitMessage
         , Event
           -- , BadOpen(..)
@@ -37,6 +38,11 @@ type alias Settings =
 --     = BadSecurity
 --     | BadArgs
 -- open : String -> (String -> msg) -> Task x Serial
+
+
+connect : String -> Task x Int
+connect =
+    Native.Serial.connect
 
 
 waitMessage :
