@@ -82,11 +82,11 @@ var _baden$test_elm_chrome$Native_Serial = function() {
 
     // var serial = chrome.serial;
     var waitMessage = function(onMessageTask) {
-        console.log("+> waitMessage", [onMessageTask]);
+        // console.log("+> waitMessage", [onMessageTask]);
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-            console.log("open:binding", [callback]);
+            // console.log("open:binding", [callback]);
             var id = setInterval(function(){
-                console.log("open:binding:interval", [callback]);
+                // console.log("open:binding:interval", [callback]);
                 // onMessageTask
                 var data = {id: 42, data: "Fake string"};
                 var task = onMessageTask(data);

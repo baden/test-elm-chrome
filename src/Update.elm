@@ -284,11 +284,11 @@ addPortMsg id text =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    let
-        _ =
-            Debug.log "subscriptions" model.debug
-    in
-        Serial.messages OnPortMessage
+    -- let
+    --     _ =
+    --         Debug.log "subscriptions" model.debug
+    -- in
+    Serial.messages OnPortMessage
 
 
 

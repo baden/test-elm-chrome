@@ -121,11 +121,11 @@ type alias State msg =
 
 init : Task Never (State msg)
 init =
-    let
-        _ =
-            Debug.log "Serial:init" 0
-    in
-        Task.succeed Nothing
+    -- let
+    --     _ =
+    --         Debug.log "Serial:init" 0
+    -- in
+    Task.succeed Nothing
 
 
 onSelfMsg :
@@ -136,16 +136,16 @@ onSelfMsg :
 onSelfMsg router selfMsg state =
     let
         _ =
-            Debug.log "Serial:onSelfMsg" 0
-
-        _ =
-            Debug.log "     router" router
-
-        _ =
-            Debug.log "    selfMsg" selfMsg
-
-        _ =
-            Debug.log "     state" state
+            Debug.log
+                ("Serial:onSelfMsg"
+                    ++ "\n  router"
+                    ++ toString (router)
+                    ++ "\n  selfMsg"
+                    ++ toString (selfMsg)
+                    ++ "\n  state"
+                    ++ toString (state)
+                )
+                0
     in
         case state of
             Nothing ->
@@ -167,24 +167,23 @@ onEffects :
     -> State msg
     -> Task Never (State msg)
 onEffects router cmds subs state =
-    let
-        _ =
-            Debug.log "Serial:onEffects" 0
-
-        _ =
-            Debug.log "     router" router
-
-        _ =
-            Debug.log "     cmds" cmds
-
-        _ =
-            Debug.log "     subs" subs
-
-        _ =
-            Debug.log "     state" state
-    in
-        case state of
-            Nothing ->
+    case state of
+        Nothing ->
+            let
+                _ =
+                    Debug.log
+                        ("Serial:onEffects"
+                            ++ "\n     router"
+                            ++ toString (router)
+                            ++ "\n     cmds"
+                            ++ toString (cmds)
+                            ++ "\n     subs"
+                            ++ toString (subs)
+                            ++ "\n     state"
+                            ++ toString (state)
+                        )
+                        0
+            in
                 case subs of
                     [] ->
                         Task.succeed state
@@ -196,10 +195,10 @@ onEffects router cmds subs state =
                                     Task.succeed (Just { subs = subs, listener = listener })
                                 )
 
-            -- Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
-            --     |> Task.andThen
-            --         (\listener ->
-            --             Task.succeed (Just { subs = subs, listener = listener })
-            --         )
-            Just { subs, listener } ->
-                Task.succeed state
+        -- Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
+        --     |> Task.andThen
+        --         (\listener ->
+        --             Task.succeed (Just { subs = subs, listener = listener })
+        --         )
+        Just { subs, listener } ->
+            Task.succeed state
