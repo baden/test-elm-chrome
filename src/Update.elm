@@ -70,6 +70,14 @@ onScrollJsonParser =
 
 
 
+-- onChangeColor port_id =
+--     Json.Decode.map (OnChangeColorEvent port_id) (onChangeColorParser port_id)
+--         |> Html.Events.on "input"
+--
+--
+-- onChangeColorParser =
+--     Json.Decode.map OnChangeColorEvent
+--         (Json.Decode.at [ "target", "value" ] Json.Decode.float)
 -- scrollToBottom : Cmd Msg
 -- scrollToBottom =
 --     Process.sleep (1 * Time.second)
@@ -162,6 +170,22 @@ update msg model =
                 --         (Serial.open "my_path" OnPortMessage)
             in
                 model ! []
+
+        OnChangeColorEvent port_id value ->
+            let
+                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
+                -- Как-то совсем не функциональный подход
+                new_ports =
+                    model.ports
+                        |> List.map
+                            (\p ->
+                                if p.id == port_id then
+                                    { p | logColor = value }
+                                else
+                                    p
+                            )
+            in
+                { model | ports = new_ports } ! []
 
         OnPortReceive ev_line ->
             let

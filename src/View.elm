@@ -146,6 +146,8 @@ port_view model port_ =
         , button
             [ class "colorpicker"
             , title "Цвет текста"
+              -- , onChangeColor port_.id
+            , Html.Events.onInput (OnChangeColorEvent port_.id)
             ]
             [ input
                 [ type_ "color"

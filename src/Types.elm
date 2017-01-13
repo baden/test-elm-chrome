@@ -26,7 +26,9 @@ import Serial.LowLevel as SLL
 
 type alias Model =
     { uid : Int
-    , portList : List Serial.Port
+    , portList :
+        List Serial.Port
+        -- TODO: Заменить на Dict id Port
     , ports : List Port
     , time : Time.Time
     , debug : String
@@ -44,36 +46,13 @@ initModel =
     , portList = []
     , ports = []
     , time = 0
-    , debug =
-        ""
-        -- , logs = []
-        -- , logs = Array.fromList (List.repeat 10000 "Fake log with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!")
-    , logs =
-        Array.empty
-        -- List.range 1 999999
-        -- List.range 1 0
-        --     |> List.map
-        --         (\c ->
-        --             fakeLog
-        --                 (c % 4)
-        --                 (Date.fromTime 0)
-        --                 ("Fake log #"
-        --                     ++ (toString c)
-        --                     ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
-        --                 )
-        --         )
-        --     |> Array.fromList
+    , debug = ""
+    , logs = Array.empty
     , last_timestamp = Date.fromTime 0
     , last_labelid = 0
     , shouldScroll = False
     , scrollEvent = OnScrollEvent 0 0 0
     }
-
-
-
--- "Fake log #"
---     ++ (toString c)
---     ++ " with tons of text. Yeap, realy, lot of helpful text. Not kidding, each word is most important. Ok, enough. I sad STOP!"
 
 
 type alias Port =
@@ -84,17 +63,11 @@ type alias Port =
     }
 
 
-
--- initPort : Int -> Port
--- initPort id =
---     { id = id
---     }
-
-
 type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
+    | OnChangeColorEvent Int String
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event
     | Tick Time.Time

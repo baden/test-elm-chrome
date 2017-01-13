@@ -39,13 +39,13 @@ messages taggerOk taggerError =
 
 subMap : (a -> b) -> MySub a -> MySub b
 subMap func (Message taggerOk taggerError) =
-    let
-        _ =
-            Debug.log "Serial:subMap" ( func, taggerOk, taggerError )
-    in
-        -- case sub of
-        --     Message tagger ->
-        Message (taggerOk >> func) (taggerError >> func)
+    -- let
+    --     _ =
+    --         Debug.log "Serial:subMap" ( func, taggerOk, taggerError )
+    -- in
+    --     -- case sub of
+    --     --     Message tagger ->
+    Message (taggerOk >> func) (taggerError >> func)
 
 
 
