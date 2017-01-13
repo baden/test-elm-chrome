@@ -1,35 +1,14 @@
 effect module Serial
-    where { command = MyCmd, subscription = MySub }
+    where { subscription = MySub }
     exposing
-        ( loadTime
-        , addOne
-        , set
-        , getDevices
+        ( getDevices
         , Port
-          -- , open
         , messages
         )
-
--- import Native.Serial
 
 import Task exposing (Task)
 import Serial.LowLevel as SLL
 import Process
-
-
--- this will be our function which returns a number plus one
--- addOne a =
---     a + 1
--- COMMANDS
-
-
-type MyCmd msg
-    = Send String String
-
-
-cmdMap : (a -> b) -> MyCmd a -> MyCmd b
-cmdMap _ (Send url msg) =
-    Send url msg
 
 
 type alias Port =
@@ -38,70 +17,35 @@ type alias Port =
     }
 
 
-addOne : Int -> Int
-addOne =
-    Native.Serial.addOne
-
-
-loadTime : Float
-loadTime =
-    Native.Serial.loadTime
-
-
-set : String -> Task x ()
-set =
-    Native.Serial.set
-
-
 getDevices : Task x (List Port)
 getDevices =
     Native.Serial.getDevices
 
 
 type MySub msg
-    = Message (SLL.Event -> msg)
+    = Message (SLL.Event -> msg) (SLL.Event -> msg)
+
+
+messages : (SLL.Event -> msg) -> (SLL.Event -> msg) -> Sub msg
+messages taggerOk taggerError =
+    subscription (Message taggerOk taggerError)
 
 
 
--- open :
---     String
---     -> Platform.Router msg Msg
---     -> Task SLL.BadOpen SLL.Serial
--- open path router =
---     SLL.open path
---         { onMessage = \_ msg -> Platform.sendToSelf router (Receive path msg)
---         }
--- open : String -> (String -> msg) -> Task x SLL.Serial
--- open =
---     SLL.open
-
-
-messages : (SLL.Event -> msg) -> Sub msg
-messages tagger =
-    subscription (Message tagger)
-
-
-
--- SLL.l
-
-
-type alias Event =
-    {}
-
-
-
+-- type alias Event =
+--     {}
 -- SUBSCRIPTIONS
 
 
 subMap : (a -> b) -> MySub a -> MySub b
-subMap func (Message tagger) =
+subMap func (Message taggerOk taggerError) =
     let
         _ =
-            Debug.log "Serial:subMap" ( func, tagger )
+            Debug.log "Serial:subMap" ( func, taggerOk, taggerError )
     in
         -- case sub of
         --     Message tagger ->
-        Message (tagger >> func)
+        Message (taggerOk >> func) (taggerError >> func)
 
 
 
@@ -151,8 +95,8 @@ onSelfMsg router selfMsg state =
 
                     Just { subs } ->
                         let
-                            send (Message tagger) =
-                                Platform.sendToApp router (tagger event)
+                            send (Message taggerOk _) =
+                                Platform.sendToApp router (taggerOk event)
                         in
                             Task.sequence (List.map send subs)
                                 |> Task.andThen (\_ -> Task.succeed state)
@@ -164,8 +108,8 @@ onSelfMsg router selfMsg state =
 
                     Just { subs } ->
                         let
-                            send (Message tagger) =
-                                Platform.sendToApp router (tagger event)
+                            send (Message _ taggerError) =
+                                Platform.sendToApp router (taggerError event)
                         in
                             Task.sequence (List.map send subs)
                                 |> Task.andThen (\_ -> Task.succeed state)
@@ -173,11 +117,10 @@ onSelfMsg router selfMsg state =
 
 onEffects :
     Platform.Router msg Msg
-    -> List (MyCmd msg)
     -> List (MySub msg)
     -> State msg
     -> Task Never (State msg)
-onEffects router cmds subs state =
+onEffects router subs state =
     case state of
         Nothing ->
             let
@@ -186,8 +129,6 @@ onEffects router cmds subs state =
                         ("Serial:onEffects"
                             ++ "\n     router"
                             ++ toString (router)
-                            ++ "\n     cmds"
-                            ++ toString (cmds)
                             ++ "\n     subs"
                             ++ toString (subs)
                             ++ "\n     state"

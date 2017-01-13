@@ -299,7 +299,7 @@ subscriptions model =
     --     _ =
     --         Debug.log "subscriptions" model.debug
     -- in
-    Serial.messages OnPortReceive
+    Serial.messages OnPortReceive OnPortReceiveError
 
 
 
