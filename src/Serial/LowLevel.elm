@@ -25,12 +25,10 @@ type alias Event =
 
 
 type alias Settings =
-    { --onOpen : Serial -> Task Never ()
-      --,
-      onMessage :
-        Serial -> String -> Task Never ()
-        -- , onError : () -> Task Never ()
-        -- , onClose : { code : Int, reason : String, wasClean : Bool } -> Task Never ()
+    { onReceive :
+        { id : Int, data : String } -> Task Never ()
+    , onReceiveError :
+        { id : Int, data : String } -> Task Never ()
     }
 
 

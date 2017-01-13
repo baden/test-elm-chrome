@@ -99,13 +99,13 @@ type alias Event =
 
 subMap : (a -> b) -> MySub a -> MySub b
 subMap func (Message tagger) =
-    -- let
-    --     _ =
-    --         Debug.log "Serial:subMap" ( func, tagger )
-    -- in
-    --     -- case sub of
-    --     --     Message tagger ->
-    Message (tagger >> func)
+    let
+        _ =
+            Debug.log "Serial:subMap" ( func, tagger )
+    in
+        -- case sub of
+        --     Message tagger ->
+        Message (tagger >> func)
 
 
 
@@ -189,16 +189,24 @@ onEffects router cmds subs state =
                         Task.succeed state
 
                     _ ->
-                        Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
+                        Process.spawn (waiter router)
                             |> Task.andThen
                                 (\listener ->
                                     Task.succeed (Just { subs = subs, listener = listener })
                                 )
 
-        -- Process.spawn (SLL.waitMessage (Platform.sendToSelf router) (\_ -> Task.succeed ()))
-        --     |> Task.andThen
-        --         (\listener ->
-        --             Task.succeed (Just { subs = subs, listener = listener })
-        --         )
         Just { subs, listener } ->
             Task.succeed state
+
+
+waiter : Platform.Router a SLL.Event -> Task x SLL.Serial
+waiter router =
+    SLL.waitMessage
+        (\msg ->
+            let
+                _ =
+                    Debug.log "waiter Msg: " msg
+            in
+                Platform.sendToSelf router msg
+        )
+        (\_ -> Task.succeed ())
