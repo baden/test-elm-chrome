@@ -68,6 +68,7 @@ type Msg
     | RemovePort Int
     | ConnectPort Port
     | PortConnected Int
+    | OnChangePortPath Int String
     | OnChangeColorEvent Int String
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event

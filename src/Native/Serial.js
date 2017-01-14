@@ -27,16 +27,78 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         });
     });
 
+    var ab2str = function(buf) {
+        var u8buf = new Uint8Array(buf);
+        // u8buf.forEach(function(c){
+        //     console.log("c=", c);
+        // });
+        // var u8buf_filtered = u8buf.map(function(char){
+        //     if((char < 32)||(char > 127)) return 33;
+        //     return char;
+        // });
+        // return String.fromCharCode.apply(null, u8buf_filtered);
+        return String.fromCharCode.apply(null, u8buf);
+    };
+
+    var lineBuffers = {};
+
     var waitMessage = function(settings) {
         console.log("+> waitMessage", [settings]);
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
             // console.log("open:binding", [callback]);
 
             chrome.serial.onReceive.addListener(function(info){
-                console.log("port on receive", [info]);
-                var data = {id: 1, data: "Fake string"};
-                var task = settings.onReceive(data);
-                _elm_lang$core$Native_Scheduler.rawSpawn(task);
+                var cid = info.connectionId;
+                var as_string = ab2str(info.data);
+                console.log("port on receive", [info, as_string]);
+
+                // TODO: Это все нужно вынести в Elm
+
+                lineBuffers[cid] = lineBuffers[cid] || '';
+                lineBuffers[cid] += as_string;
+
+                var index;
+                while ((index = lineBuffers[cid].indexOf('\r')) >= 0) {
+                    var line;
+                    if(lineBuffers[cid].substr(0, 1) === '\n') {
+                        line = lineBuffers[cid].substr(1, index-1);
+                    } else {
+                        line = lineBuffers[cid].substr(0, index);
+                    }
+                    lineBuffers[cid] = lineBuffers[cid].substr(index + 1);
+
+                    if(line.length > 0) {
+                		console.log("log", [line]);
+
+                		var uri;
+                		try{
+                		    uri = decodeURIComponent(escape(line));
+                		} catch (e) {
+                		    var length = line.length;
+                            var i;
+                		    uri = "<" + length + " binary[";
+                		    if(length <= 48) {
+                                for(i=0; i<length; i++) {
+                                    uri += " " + ("00" + (line.charCodeAt(i)).toString(16).toUpperCase()).slice(-2);
+                                }
+                            } else {
+                                for(i=0; i<22; i++) {
+                                    uri += " " + (" 00" + (line.charCodeAt(i)).toString(16).toUpperCase()).slice(-2);
+                                }
+                                uri += " ...";
+                                for(i=length-22; i<length; i++) {
+                                    uri += " " + (" 00" + (line.charCodeAt(i)).toString(16).toUpperCase()).slice(-2);
+                                }
+                            }
+                			uri += " ]>";
+                		}
+                        // this.onReadLine.dispatch(uri);
+                        var data = {id: 1, data: uri};
+                        var task = settings.onReceive(data);
+                        _elm_lang$core$Native_Scheduler.rawSpawn(task);
+                    }
+                }
+
             });
 
             chrome.serial.onReceiveError.addListener(function(info){
@@ -60,14 +122,17 @@ var _baden$test_elm_chrome$Native_Serial = function() {
 
     var connect = function (path) {
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-            var id = setTimeout(function() {
-                // var ret = _elm_lang$core$Native_Utils.Tuple0;
-                var ret = 42;
-                callback(_elm_lang$core$Native_Scheduler.succeed(ret));
-            }, 3000);
+            console.log("connect", path);
+            var options = {
+                bitrate: 19200,
+                ctsFlowControl: false
+            };
+            chrome.serial.connect(path, options, function(info){
+                console.log("connected", [path, info]);
+                callback(_elm_lang$core$Native_Scheduler.succeed(info.connectionId));
+            });
 
             return function() {
-                clearTimeout(id);
             };
         });
     };

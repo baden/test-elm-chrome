@@ -195,6 +195,22 @@ update msg model =
             in
                 { model | ports = new_ports } ! []
 
+        OnChangePortPath port_id value ->
+            let
+                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
+                -- Как-то совсем не функциональный подход
+                new_ports =
+                    model.ports
+                        |> List.map
+                            (\p ->
+                                if p.id == port_id then
+                                    { p | path = value }
+                                else
+                                    p
+                            )
+            in
+                { model | ports = new_ports } ! []
+
         OnPortReceive ev_line ->
             let
                 _ =
@@ -217,7 +233,11 @@ update msg model =
             ( { model | time = newTime }, Cmd.none )
 
         SetSerialDevices ports ->
-            ( { model | portList = ports }, Cmd.none )
+            let
+                _ =
+                    Debug.log "SetSerialDevices" ports
+            in
+                ( { model | portList = ports }, Cmd.none )
 
         ChatScrolled event ->
             { model
@@ -312,7 +332,7 @@ addPortMsg id text =
                 let
                     fakeLogLine =
                         LogLine
-                            (text ++ (toString id))
+                            text
                             now
                             0
                             (PortId id)

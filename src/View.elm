@@ -2,7 +2,7 @@ module View exposing (view)
 
 import Html exposing (Html, div, button, text, select, option, p, pre, a, input, span, node)
 import Html.Attributes exposing (class, value, id, title, disabled, type_, placeholder, style, attribute)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Types
     exposing
         ( Port
@@ -101,7 +101,7 @@ portLabel path name =
 
 portOption : Serial.Port -> Html a
 portOption p =
-    option [ value (toString p.path) ]
+    option [ value p.path ]
         [ text (portLabel p.path p.displayName) ]
 
 
@@ -134,7 +134,10 @@ fakeSpeedList =
 port_view : Model -> Port -> Html Msg
 port_view model port_ =
     div [ class "port" ]
-        [ select [] (listPorts model.portList)
+        [ select
+            [ onInput (OnChangePortPath port_.id)
+            ]
+            (listPorts model.portList)
         , select [] (listToHtmlSelectOptions fakeSpeedList)
         , button
             [ title "Подключить порт и начать запись лога"
@@ -147,7 +150,7 @@ port_view model port_ =
             [ class "colorpicker"
             , title "Цвет текста"
               -- , onChangeColor port_.id
-            , Html.Events.onInput (OnChangeColorEvent port_.id)
+            , onInput (OnChangeColorEvent port_.id)
             ]
             [ input
                 [ type_ "color"
