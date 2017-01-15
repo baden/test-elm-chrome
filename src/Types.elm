@@ -36,6 +36,7 @@ type alias Model =
     , last_timestamp : Date.Date
     , last_labelid : Int
     , shouldScroll : Bool
+    , autoscroll : Bool
     , scrollEvent : OnScrollEvent
     }
 
@@ -51,6 +52,7 @@ initModel =
     , last_timestamp = Date.fromTime 0
     , last_labelid = 0
     , shouldScroll = False
+    , autoscroll = True
     , scrollEvent = OnScrollEvent 0 0 0
     }
 

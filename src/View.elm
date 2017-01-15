@@ -47,8 +47,22 @@ control_view model =
             ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
         , gr
-            [ button [ title "Отключить автопрокрутку окна лога" ] [ text "⏸" ]
-            , button [ title "Включить автопрокрутку окна лога", disabled True, class "active", toLeftGroup ] [ text "⏵" ]
+            [ button
+                [ title "Отключить автопрокрутку окна лога"
+                ]
+                [ text "⏸" ]
+            , button
+                [ title "Включить автопрокрутку окна лога"
+                , disabled True
+                , class
+                    (if model.autoscroll then
+                        scroll "active"
+                     else
+                        ""
+                    )
+                , toLeftGroup
+                ]
+                [ text "⏵" ]
             ]
         , button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
@@ -64,28 +78,6 @@ control_view model =
           -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
         , button [ title "Настройки" ] [ text "🛠" ]
         ]
-
-
-
--- Cmd.batch
--- addLabel =
---     let
---         _ =
---             Debug.log "click" 0
---
---         sender =
---             LabelId 0
---
---         fakeDate =
---             Date.fromTime 0
---     in
---         -- Task.sequence
---         -- [ Task.perform AddLogLine Date.now
---         --     |> Cmd.batch
---         -- ]
---         Task.succeed ( fakeDate, sender, "====" )
---             |> Task.perform AddLogLine
---             |> Cmd.batch
 
 
 toSelectOption : String -> Html a

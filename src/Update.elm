@@ -43,11 +43,16 @@ init =
     ( initModel, Cmd.batch [ getSerialDevices ] )
 
 
-scrollToBottom : Cmd Msg
-scrollToBottom =
+scrollToBottom : Bool -> Cmd Msg
+scrollToBottom scroll =
     -- Task.perform DomError (always NoOp) (toBottom id)
-    Dom.Scroll.toBottom "log"
-        |> Task.attempt (always NoOp)
+    case scroll of
+        True ->
+            Dom.Scroll.toBottom "log"
+                |> Task.attempt (always NoOp)
+
+        False ->
+            Cmd.none
 
 
 onScroll : (OnScrollEvent -> msg) -> Html.Attribute msg
@@ -155,11 +160,11 @@ update msg model =
                     | logs = new_logs
                     , last_timestamp = logLine.timestamp
                 }
-                    ! [ scrollToBottom ]
+                    ! [ scrollToBottom model.autoscroll ]
 
         ClearLog ->
             { model | logs = Array.empty }
-                ! [ scrollToBottom ]
+                ! [ scrollToBottom True ]
 
         ConnectPort port_ ->
             let
