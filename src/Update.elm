@@ -188,86 +188,28 @@ update msg model =
                 model ! [ Serial.disconnect port_.cid PortDisconnected ]
 
         PortConnected ( path, cid ) ->
-            let
-                _ =
-                    Debug.log "Port connected" ( path, cid )
-
-                new_ports =
-                    model.ports
-                        |> List.map
-                            (\p ->
-                                if p.path == path then
-                                    { p | connected = True, cid = cid }
-                                else
-                                    p
-                            )
-            in
-                { model | ports = new_ports } ! []
+            { model | ports = patchPort model.ports .path path (\p -> { p | connected = True, cid = cid }) } ! []
 
         PortDisconnected ( cid, result ) ->
-            let
-                _ =
-                    Debug.log "Port connected" ( cid, result )
-
-                new_ports =
-                    model.ports
-                        |> List.map
-                            (\p ->
-                                if p.cid == cid then
-                                    { p | connected = False, cid = 0 }
-                                else
-                                    p
-                            )
-            in
-                { model | ports = new_ports } ! []
+            { model
+                | ports = patchPort model.ports .cid cid (\p -> { p | connected = False, cid = 0 })
+            }
+                ! []
 
         OnChangeColorEvent cid value ->
-            let
-                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
-                -- Как-то совсем не функциональный подход
-                new_ports =
-                    model.ports
-                        |> List.map
-                            (\p ->
-                                if p.cid == cid then
-                                    { p | logColor = value }
-                                else
-                                    p
-                            )
-            in
-                { model | ports = new_ports } ! []
+            { model
+                | ports = patchPort model.ports .cid cid (\p -> { p | logColor = value })
+            }
+                ! []
 
         OnChangePortPath port_id value ->
-            let
-                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
-                -- Как-то совсем не функциональный подход
-                new_ports =
-                    model.ports
-                        |> List.map
-                            (\p ->
-                                if p.id == port_id then
-                                    { p | path = value }
-                                else
-                                    p
-                            )
-            in
-                { model | ports = new_ports } ! []
+            { model
+                | ports = patchPort model.ports .id port_id (\p -> { p | path = value })
+            }
+                ! []
 
         OnChangePortBoudrate port_id value ->
-            let
-                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
-                -- Как-то совсем не функциональный подход
-                new_ports =
-                    model.ports
-                        |> List.map
-                            (\p ->
-                                if p.id == port_id then
-                                    { p | boudrate = value }
-                                else
-                                    p
-                            )
-            in
-                { model | ports = new_ports } ! []
+            { model | ports = patchPort model.ports .id port_id (\p -> { p | boudrate = value }) } ! []
 
         OnPortReceive ev_line ->
             let
@@ -329,6 +271,17 @@ update msg model =
 
         NoOp ->
             model ! []
+
+
+patchPort ports cond value fun =
+    ports
+        |> List.map
+            (\p ->
+                if (cond p) == value then
+                    fun p
+                else
+                    p
+            )
 
 
 saveLogToFile : Array LogLine -> Cmd Msg
