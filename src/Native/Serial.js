@@ -93,7 +93,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
                 			uri += " ]>";
                 		}
                         // this.onReadLine.dispatch(uri);
-                        var data = {id: 1, data: uri};
+                        var data = {id: cid, data: uri};
                         var task = settings.onReceive(data);
                         _elm_lang$core$Native_Scheduler.rawSpawn(task);
                     }
@@ -137,11 +137,25 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         });
     };
 
+    var disconnect = function (cid) {
+        return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+            console.log("disconnect", cid);
+            chrome.serial.disconnect(cid, function(result){
+                console.log("disconnected", [cid, result]);
+                callback(_elm_lang$core$Native_Scheduler.succeed(result));
+            });
+
+            return function() {
+            };
+        });
+    };
+
     return {
         // waitMessage: F2(waitMessage),
         waitMessage: waitMessage,
         getDevices: getDevices,
-        connect: connect
+        connect: connect,
+        disconnect: disconnect
         // getDevices: F2(getDevices)
     };
 

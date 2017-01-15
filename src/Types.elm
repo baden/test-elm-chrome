@@ -70,7 +70,9 @@ type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
+    | DisconnectPort Port
     | PortConnected ( String, Int )
+    | PortDisconnected ( Int, Bool )
     | OnChangePortPath Int String
     | OnChangePortBoudrate Int String
     | OnChangeColorEvent Int String

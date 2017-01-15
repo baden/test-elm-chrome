@@ -165,12 +165,15 @@ update msg model =
             let
                 _ =
                     Debug.log "Connect" port_
-
-                -- s =
-                --     Debug.log "Open"
-                --         (Serial.open "my_path" OnPortMessage)
             in
                 model ! [ Serial.connect port_.path PortConnected ]
+
+        DisconnectPort port_ ->
+            let
+                _ =
+                    Debug.log "Disconnect" port_
+            in
+                model ! [ Serial.disconnect port_.cid PortDisconnected ]
 
         PortConnected ( path, cid ) ->
             let
@@ -189,7 +192,24 @@ update msg model =
             in
                 { model | ports = new_ports } ! []
 
-        OnChangeColorEvent port_id value ->
+        PortDisconnected ( cid, result ) ->
+            let
+                _ =
+                    Debug.log "Port connected" ( cid, result )
+
+                new_ports =
+                    model.ports
+                        |> List.map
+                            (\p ->
+                                if p.cid == cid then
+                                    { p | connected = False, cid = 0 }
+                                else
+                                    p
+                            )
+            in
+                { model | ports = new_ports } ! []
+
+        OnChangeColorEvent cid value ->
             let
                 -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
                 -- Как-то совсем не функциональный подход
@@ -197,7 +217,7 @@ update msg model =
                     model.ports
                         |> List.map
                             (\p ->
-                                if p.id == port_id then
+                                if p.cid == cid then
                                     { p | logColor = value }
                                 else
                                     p

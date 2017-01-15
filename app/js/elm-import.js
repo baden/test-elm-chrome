@@ -60,11 +60,16 @@ var fakeSerial = (function(){
         callback(data);
     };
 
+    var disconnect = function(cid, callback) {
+        callback(true);
+    };
+
     return {
         getDevices
         , onReceive
         , onReceiveError
         , connect
+        , disconnect
     };
 
 })();

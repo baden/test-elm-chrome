@@ -2,6 +2,7 @@ module Serial.LowLevel
     exposing
         ( Serial
         , connect
+        , disconnect
         , waitMessage
         , Event
           -- , BadOpen(..)
@@ -43,6 +44,11 @@ type alias Settings =
 connect : String -> Task x Int
 connect =
     Native.Serial.connect
+
+
+disconnect : Int -> Task x Bool
+disconnect =
+    Native.Serial.disconnect
 
 
 waitMessage :

@@ -167,6 +167,7 @@ port_view model port_ =
                     "active"
                 )
             , toLeftGroup
+            , onClick (DisconnectPort port_)
             ]
             [ text "⏹" ]
         , button
@@ -179,7 +180,7 @@ port_view model port_ =
                 [ type_ "color"
                 , value port_.logColor
                 , disabled (port_.path == "")
-                , onInput (OnChangeColorEvent port_.id)
+                , onInput (OnChangeColorEvent port_.cid)
                 ]
                 []
             ]
@@ -423,7 +424,7 @@ stylesheet m =
 
         rule p =
             "pre.log p[class^=\"port_"
-                ++ (toString p.id)
+                ++ (toString p.cid)
                 ++ "\"] {"
                 ++ "color: "
                 ++ p.logColor

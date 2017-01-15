@@ -4,6 +4,7 @@ effect module Serial
         ( getDevices
         , Port
         , connect
+        , disconnect
         , messages
         )
 
@@ -191,6 +192,20 @@ waiter router =
 connect : String -> (( String, Int ) -> msg) -> Cmd msg
 connect path target =
     SLL.connect path
+        |> Task.andThen
+            (\b ->
+                let
+                    _ =
+                        Debug.log "then" b
+                in
+                    Task.succeed ( path, b )
+            )
+        |> Task.perform target
+
+
+disconnect : Int -> (( Int, Bool ) -> msg) -> Cmd msg
+disconnect path target =
+    SLL.disconnect path
         |> Task.andThen
             (\b ->
                 let
