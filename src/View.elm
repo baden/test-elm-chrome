@@ -171,18 +171,24 @@ port_view model port_ =
             [ text "⏹" ]
         , button
             [ class "colorpicker"
+            , title "Цвет текста лога"
             , disabled (port_.path == "")
-            , title "Цвет текста"
-              -- , onChangeColor port_.id
-            , onInput (OnChangeColorEvent port_.id)
             ]
-            [ input
+            [ text "W"
+            , input
                 [ type_ "color"
                 , value port_.logColor
+                , disabled (port_.path == "")
+                , onInput (OnChangeColorEvent port_.id)
                 ]
                 []
             ]
-        , button [ title "Удалить", onClick (RemovePort port_.id) ] [ text "🚮" ]
+        , button
+            [ title "Удалить"
+            , disabled (port_.connected)
+            , onClick (RemovePort port_.id)
+            ]
+            [ text "🚮" ]
           -- 🞩
           -- , text (toString port_)
           -- , text " / "

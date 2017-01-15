@@ -203,8 +203,9 @@ img, a {
   padding-right: 1em;
 }*/
 
-button, .control span {
+button,select, .control span {
     /*padding: 4px 8px;*/
+    padding: 0 6px;
     margin: 2px;
     height: 30px;
     font-family: 'Open Sans Condensed', sans-serif;
@@ -217,19 +218,6 @@ button, .control span {
     border: 1px solid #ccc;
 }
 
-select {
-    /*padding: 4px 8px;*/
-    margin: 2px;
-    height: 30px;
-    font-family: 'Open Sans Condensed', sans-serif;
-    text-shadow: 0 1px 0 rgb(240, 240, 240);
-    font-size: 18px;
-    /*background: transparent;*/
-    background: #fff;
-    /*-webkit-appearance: none;
-    appearance: none;*/
-    border: 1px solid #ccc;
-}
 
 button.record {
     color: #a00;
@@ -241,13 +229,14 @@ button[disabled], button.record[disabled] {
 }
 
 button.colorpicker {
-    padding: 0px;
-    margin: 0 2px;
     position: relative;
+    max-width: 29px;
+    /*padding: 0px;
+    margin: 0 2px;
     top: 8px;
     height: 30px;
     position: relative;
-    width: 29px;
+    width: 29px;*/
 }
 
 input[type="color"] {
@@ -255,7 +244,8 @@ input[type="color"] {
     margin: 0px;
     height: 24px;
     width: 24px;*/
-    background: #fff;
+    /*background: #fff;*/
+    background: none;
     -webkit-appearance: none;
     border: none;
 }
@@ -270,7 +260,7 @@ input[type="color"]::-webkit-color-swatch {
     margin: 0;
 }
 input[type="color" i] {
-    padding: 1px;
+    padding: 3px;
     margin: 0;
     height: 28px;
     position: absolute;
@@ -281,12 +271,12 @@ input[type="color" i] {
 
 span.find {
     display: inline-block;
-    padding: 1px 4px;
+    padding: 1px 4px 0px 4px;
     /*margin: 0px;*/
 }
 
 span.find input {
-    padding: 3px 4px;
+    padding: 3px 4px 1px 4px;
     margin: 0;
     margin-left: 8px;
     font-size: 14px;
