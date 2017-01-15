@@ -203,10 +203,24 @@ img, a {
   padding-right: 1em;
 }*/
 
-button, select, .control span {
-    padding: 4px 8px;
+button, .control span {
+    /*padding: 4px 8px;*/
     margin: 2px;
-    /*height: 30px;*/
+    height: 30px;
+    font-family: 'Open Sans Condensed', sans-serif;
+    text-shadow: 0 1px 0 rgb(240, 240, 240);
+    font-size: 18px;
+    /*background: transparent;*/
+    background: #fff;
+    /*-webkit-appearance: none;
+    appearance: none;*/
+    border: 1px solid #ccc;
+}
+
+select {
+    /*padding: 4px 8px;*/
+    margin: 2px;
+    height: 30px;
     font-family: 'Open Sans Condensed', sans-serif;
     text-shadow: 0 1px 0 rgb(240, 240, 240);
     font-size: 18px;
@@ -227,18 +241,20 @@ button[disabled], button.record[disabled] {
 }
 
 button.colorpicker {
-    padding: 2px;
-    margin: 0;
+    padding: 0px;
+    margin: 0 2px;
     position: relative;
-    top: 6px;
-    height: 31px;
+    top: 8px;
+    height: 30px;
+    position: relative;
+    width: 29px;
 }
 
 input[type="color"] {
-    padding: 0px;
+    /*padding: 0px;
     margin: 0px;
     height: 24px;
-    width: 24px;
+    width: 24px;*/
     background: #fff;
     -webkit-appearance: none;
     border: none;
@@ -254,14 +270,18 @@ input[type="color"]::-webkit-color-swatch {
     margin: 0;
 }
 input[type="color" i] {
-    padding: 0;
+    padding: 1px;
     margin: 0;
-    /*height: 30px;*/
+    height: 28px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 27px;
 }
 
 span.find {
     display: inline-block;
-    padding: 2px 4px;
+    padding: 1px 4px;
     /*margin: 0px;*/
 }
 
@@ -287,8 +307,8 @@ span.find span:hover {
 }
 
 button.active {
-    background: #4187db;
-    color: white;
+    background: #cee3fd;
+    /*color: white;*/
     text-shadow: none;
 }
 

@@ -166,6 +166,7 @@ port_view model port_ =
                  else
                     "active"
                 )
+            , toLeftGroup
             ]
             [ text "⏹" ]
         , button
