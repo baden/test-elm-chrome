@@ -171,7 +171,13 @@ update msg model =
                 _ =
                     Debug.log "Connect" port_
             in
-                model ! [ Serial.connect port_.path PortConnected ]
+                model
+                    ! [ Serial.connect
+                            ( port_.path
+                            , String.toInt port_.boudrate |> Result.withDefault 19200
+                            )
+                            PortConnected
+                      ]
 
         DisconnectPort port_ ->
             let

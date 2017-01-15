@@ -41,7 +41,7 @@ type alias Settings =
 -- open : String -> (String -> msg) -> Task x Serial
 
 
-connect : String -> Task x Int
+connect : String -> Int -> Task x Int
 connect =
     Native.Serial.connect
 

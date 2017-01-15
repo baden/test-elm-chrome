@@ -189,9 +189,9 @@ waiter router =
 --     Native.Serial.connect
 
 
-connect : String -> (( String, Int ) -> msg) -> Cmd msg
-connect path target =
-    SLL.connect path
+connect : ( String, Int ) -> (( String, Int ) -> msg) -> Cmd msg
+connect ( path, baudrate ) target =
+    SLL.connect path baudrate
         |> Task.andThen
             (\b ->
                 let

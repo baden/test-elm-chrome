@@ -120,11 +120,11 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         });
     };
 
-    var connect = function (path) {
+    var connect = function (path, baudrate) {
         return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-            console.log("connect", path);
+            console.log("connect", [path, baudrate]);
             var options = {
-                bitrate: 19200,
+                bitrate: baudrate,
                 ctsFlowControl: false
             };
             chrome.serial.connect(path, options, function(info){
@@ -154,7 +154,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         // waitMessage: F2(waitMessage),
         waitMessage: waitMessage,
         getDevices: getDevices,
-        connect: connect,
+        connect: F2(connect),
         disconnect: disconnect
         // getDevices: F2(getDevices)
     };
