@@ -49,6 +49,12 @@ control_view model =
         , gr
             [ button
                 [ title "Отключить автопрокрутку окна лога"
+                , class
+                    (if model.autoscroll then
+                        ""
+                     else
+                        scroll "active"
+                    )
                 ]
                 [ text "⏸" ]
             , button
