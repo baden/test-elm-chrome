@@ -222,7 +222,7 @@ button, select, .control span {
     overflow: hidden;
 }
 
-.find {
+.find, .label {
     display: inline-block;
     position: relative;
     padding: 1px 0px 0px 8px;
@@ -233,7 +233,12 @@ button, select, .control span {
     border-radius: 8px;
 }
 
-.find button, .find input {
+.label {
+    padding: 4px 0px 0px 8px;
+}
+
+
+.find button, .find input, .label button, .label input {
     padding: 2px 8px;
     margin: -2px 0 0 0;
     border: none;
@@ -245,11 +250,16 @@ button, select, .control span {
     margin-right: 4px;
 }
 
-.find input:hover {
+.label input {
+    margin-right: 4px;
+    width: 80px;
+}
+
+.find input:hover, .label input:hover {
     border-bottom: 1px solid #ccc;
 }
 
-.find input:focus {
+.find input:focus, .label input:focus {
     outline: none;
 }
 

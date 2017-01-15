@@ -3,6 +3,7 @@ module Serial.LowLevel
         ( Serial
         , connect
         , disconnect
+        , save
         , waitMessage
         , Event
           -- , BadOpen(..)
@@ -56,3 +57,8 @@ waitMessage :
     -> Task x Serial
 waitMessage =
     Native.Serial.waitMessage
+
+
+save : List String -> Task x Bool
+save =
+    Native.Serial.save

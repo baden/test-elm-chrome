@@ -87,6 +87,8 @@ type Msg
     | ClearLog
     | EnableScroll Bool
     | NoOp
+    | SaveLogToFile
+    | SaveLogDone String
     | ChatScrolled OnScrollEvent
 
 

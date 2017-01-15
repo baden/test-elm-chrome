@@ -16,8 +16,7 @@ import Types
 import Serial
 import Update exposing (onScroll)
 import Array exposing (Array)
-import Date
-import Date.Format
+import Helpers
 
 
 -- import Time
@@ -82,7 +81,7 @@ control_view model =
             , button [ title "Далее" ] [ text "⏷" ]
             ]
         , button [ title "Заметка" ] [ text "🗩" ]
-        , button [ title "Сохранить в файл" ] [ text "💾" ]
+        , button [ title "Сохранить в файл", onClick SaveLogToFile ] [ text "💾" ]
           -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
         , button [ title "Настройки" ] [ text "🛠" ]
         ]
@@ -196,6 +195,10 @@ port_view model port_ =
                 ]
                 []
             ]
+        , div [ class "label", title "Используется как подпись строк при сохранении в файл" ]
+            [ text "L"
+            , input [ type_ "input", placeholder "Метка" ] []
+            ]
         , button
             [ title "Удалить"
             , disabled (port_.connected)
@@ -246,35 +249,11 @@ log_row l offset =
         ]
         [ div [ class "horizontal" ]
             [ a [] [ text (toString (offset + 1)) ]
-            , span [ class "time" ] [ text (dateToTime l.timestamp) ]
-            , span [ class "delta" ] [ text (deltaAsString l.delta) ]
+            , span [ class "time" ] [ text (Helpers.dateToTime l.timestamp) ]
+            , span [ class "delta" ] [ text (Helpers.deltaAsString l.delta) ]
             , span [ class "content" ] [ text l.data ]
             ]
         ]
-
-
-dateToTime : Date.Date -> String
-dateToTime date =
-    Date.Format.format "%H:%M:%S" date
-
-
-deltaAsString : Float -> String
-deltaAsString d =
-    let
-        hi =
-            floor d
-
-        lo =
-            (round (d * 1000)) % 1000
-
-        loStr =
-            toString lo
-                |> String.padLeft 3 '0'
-    in
-        if d > 1000000 then
-            "+?"
-        else
-            "+" ++ (toString hi) ++ "." ++ loStr
 
 
 logClassName : LogLine -> String

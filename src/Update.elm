@@ -28,6 +28,7 @@ import Html.Events
 import Array exposing (Array)
 import Task
 import Date
+import Helpers
 
 
 -- import Process
@@ -316,8 +317,38 @@ update msg model =
             }
                 ! []
 
+        SaveLogToFile ->
+            let
+                _ =
+                    Debug.log "save" 0
+            in
+                model ! [ saveLogToFile model.logs ]
+
+        SaveLogDone _ ->
+            model ! []
+
         NoOp ->
             model ! []
+
+
+saveLogToFile : Array LogLine -> Cmd Msg
+saveLogToFile logs =
+    let
+        logs_as_list =
+            logs
+                |> Array.foldl
+                    (\l acc ->
+                        ((Helpers.dateToTime l.timestamp)
+                            ++ "\t"
+                            ++ (Helpers.deltaAsString l.delta)
+                            ++ "\t"
+                            ++ l.data
+                        )
+                            :: acc
+                    )
+                    []
+    in
+        Serial.save logs_as_list SaveLogDone
 
 
 

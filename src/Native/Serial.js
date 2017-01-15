@@ -14,6 +14,23 @@ var _baden$test_elm_chrome$Native_Serial = function() {
     	return out;
     }
 
+    function toArray(xs) {
+        var out = [];
+        while (xs.ctor !== '[]') {
+            out.push(xs._0);
+            xs = xs._1;
+        }
+        return out;
+    }
+
+    function toArrayLF(xs) {
+        var out = [];
+        while (xs.ctor !== '[]') {
+            out.push(xs._0 + "\n");
+            xs = xs._1;
+        }
+        return out;
+    }
 
     var getDevices = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
         chrome.serial.getDevices(function(ports){
@@ -150,12 +167,37 @@ var _baden$test_elm_chrome$Native_Serial = function() {
         });
     };
 
+    var save = function (data) {
+        return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+            var data_as_array = toArrayLF(data);
+            console.log("save log", data, data_as_array);
+            var errorHandler = function(data){
+                console.log('errorHandler data=', data);
+            };
+
+            chrome.fileSystem.chooseEntry({type: 'saveFile'}, function(writableFileEntry) {
+                console.log('saveFile', writableFileEntry);
+                writableFileEntry.createWriter(function(writer) {
+                    writer.onerror = errorHandler;
+                    writer.onwriteend = function(e) {
+                        console.log('write complete e=', e);
+                        callback(_elm_lang$core$Native_Scheduler.succeed(true));
+                    };
+                    writer.write(new Blob(data_as_array, {type: 'text/plain'}));
+                }, errorHandler);
+            });
+            return function() {
+            };
+        });
+    };
+
     return {
         // waitMessage: F2(waitMessage),
         waitMessage: waitMessage,
         getDevices: getDevices,
         connect: F2(connect),
-        disconnect: disconnect
+        disconnect: disconnect,
+        save: save
         // getDevices: F2(getDevices)
     };
 

@@ -4,6 +4,7 @@ effect module Serial
         ( getDevices
         , Port
         , connect
+        , save
         , disconnect
         , messages
         )
@@ -213,5 +214,23 @@ disconnect path target =
                         Debug.log "then" b
                 in
                     Task.succeed ( path, b )
+            )
+        |> Task.perform target
+
+
+
+-- TODO: Это конечно нужно вынести в отдельный модуль
+
+
+save : List String -> (String -> msg) -> Cmd msg
+save data target =
+    SLL.save data
+        |> Task.andThen
+            (\b ->
+                let
+                    _ =
+                        Debug.log "save done" b
+                in
+                    Task.succeed "OK"
             )
         |> Task.perform target
