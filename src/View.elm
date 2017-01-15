@@ -28,6 +28,7 @@ toLeftGroup =
     style [ ( "margin-left", "-1px" ) ]
 
 
+gr : List (Html msg) -> Html msg
 gr =
     div [ class "button-group" ]
 
@@ -49,20 +50,21 @@ control_view model =
         , gr
             [ button
                 [ title "Отключить автопрокрутку окна лога"
+                , onClick (EnableScroll False)
                 , class
                     (if model.autoscroll then
                         ""
                      else
-                        scroll "active"
+                        "active"
                     )
                 ]
                 [ text "⏸" ]
             , button
                 [ title "Включить автопрокрутку окна лога"
-                , disabled True
+                , onClick (EnableScroll True)
                 , class
                     (if model.autoscroll then
-                        scroll "active"
+                        "active"
                      else
                         ""
                     )

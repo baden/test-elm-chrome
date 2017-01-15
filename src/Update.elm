@@ -283,6 +283,19 @@ update msg model =
         Tick newTime ->
             ( { model | time = newTime }, Cmd.none )
 
+        EnableScroll scroll ->
+            let
+                scroll_before =
+                    model.autoscroll
+
+                action =
+                    if scroll_before == False && scroll == True then
+                        Cmd.batch [ scrollToBottom True ]
+                    else
+                        Cmd.none
+            in
+                ( { model | autoscroll = scroll }, action )
+
         SetSerialDevices ports ->
             let
                 _ =

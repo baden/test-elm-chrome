@@ -85,6 +85,7 @@ type Msg
     | AddLabel LabelType
     | AddLogLine LogLine
     | ClearLog
+    | EnableScroll Bool
     | NoOp
     | ChatScrolled OnScrollEvent
 
