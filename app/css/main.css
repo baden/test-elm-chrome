@@ -216,8 +216,8 @@ button,select, .control span {
     /*-webkit-appearance: none;
     appearance: none;*/
     border: 1px solid #ccc;
-    /*border-radius: 15px;*/
     min-width: 30px;
+    border-radius: 5px;
 }
 
 
