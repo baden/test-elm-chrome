@@ -80,13 +80,15 @@ control_view model =
 
 toSelectOption : String -> Html a
 toSelectOption x =
-    option [] [ text x ]
+    option [ value x ] [ text x ]
 
 
 listToHtmlSelectOptions : List String -> List (Html a)
 listToHtmlSelectOptions list =
-    list
-        |> List.map toSelectOption
+    option [ value "" ] [ text "Скорость" ]
+        :: (list
+                |> List.map toSelectOption
+           )
 
 
 portLabel : String -> String -> String
@@ -107,14 +109,12 @@ portOption p =
 
 listPorts : List Serial.Port -> List (Html a)
 listPorts list =
-    ((Serial.Port "" "Порт") :: list)
-        |> List.map portOption
+    (option [ value "" ] [ text "Порт" ]) :: (list |> List.map portOption)
 
 
 fakeSpeedList : List String
 fakeSpeedList =
-    [ "Скорость"
-    , "1200"
+    [ "1200"
     , "2400"
     , "4800"
     , "9600"
@@ -138,16 +138,39 @@ port_view model port_ =
             [ onInput (OnChangePortPath port_.id)
             ]
             (listPorts model.portList)
-        , select [] (listToHtmlSelectOptions fakeSpeedList)
+        , select
+            [ disabled (port_.path == "")
+            , onInput (OnChangePortBoudrate port_.id)
+            ]
+            (listToHtmlSelectOptions fakeSpeedList)
         , button
             [ title "Подключить порт и начать запись лога"
-            , style [ ( "color", "#a00" ) ]
+            , class
+                ("record"
+                    ++ (if not port_.connected then
+                            ""
+                        else
+                            " active"
+                       )
+                )
+            , disabled ((port_.path == "") || (port_.boudrate == ""))
             , onClick (ConnectPort port_)
             ]
             [ text "⏺" ]
-        , button [ title "Остановить запись лога и отключить порт", disabled True, class "active" ] [ text "⏹" ]
+        , button
+            [ title "Остановить запись лога и отключить порт"
+            , disabled (port_.path == "")
+            , class
+                (if port_.connected then
+                    ""
+                 else
+                    "active"
+                )
+            ]
+            [ text "⏹" ]
         , button
             [ class "colorpicker"
+            , disabled (port_.path == "")
             , title "Цвет текста"
               -- , onChangeColor port_.id
             , onInput (OnChangeColorEvent port_.id)

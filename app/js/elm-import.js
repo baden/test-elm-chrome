@@ -50,10 +50,21 @@ var fakeSerial = (function(){
         }
     };
 
+    var cid = 42;
+
+    var connect = function(path, options, callback) {
+        var data = {
+            connectionId: cid
+        };
+        cid += 1;
+        callback(data);
+    };
+
     return {
         getDevices
         , onReceive
         , onReceiveError
+        , connect
     };
 
 })();

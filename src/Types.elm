@@ -58,8 +58,11 @@ initModel =
 type alias Port =
     { id : Int
     , path : String
+    , boudrate : String
     , name : String
+    , cid : Int
     , logColor : String
+    , connected : Bool
     }
 
 
@@ -67,8 +70,9 @@ type Msg
     = AddPort
     | RemovePort Int
     | ConnectPort Port
-    | PortConnected Int
+    | PortConnected ( String, Int )
     | OnChangePortPath Int String
+    | OnChangePortBoudrate Int String
     | OnChangeColorEvent Int String
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event

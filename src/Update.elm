@@ -115,7 +115,7 @@ update msg model =
                     model.uid
 
                 port_ =
-                    Types.Port id "" " " (getColor id)
+                    Types.Port id "" "" " " 0 (getColor id) False
             in
                 { model
                     | uid = model.uid + 1
@@ -172,12 +172,22 @@ update msg model =
             in
                 model ! [ Serial.connect port_.path PortConnected ]
 
-        PortConnected id ->
+        PortConnected ( path, cid ) ->
             let
                 _ =
-                    Debug.log "Port connected" id
+                    Debug.log "Port connected" ( path, cid )
+
+                new_ports =
+                    model.ports
+                        |> List.map
+                            (\p ->
+                                if p.path == path then
+                                    { p | connected = True, cid = cid }
+                                else
+                                    p
+                            )
             in
-                model ! []
+                { model | ports = new_ports } ! []
 
         OnChangeColorEvent port_id value ->
             let
@@ -205,6 +215,22 @@ update msg model =
                             (\p ->
                                 if p.id == port_id then
                                     { p | path = value }
+                                else
+                                    p
+                            )
+            in
+                { model | ports = new_ports } ! []
+
+        OnChangePortBoudrate port_id value ->
+            let
+                -- Не самое элегантное решение. Нужно ports сделать : Dict id Port
+                -- Как-то совсем не функциональный подход
+                new_ports =
+                    model.ports
+                        |> List.map
+                            (\p ->
+                                if p.id == port_id then
+                                    { p | boudrate = value }
                                 else
                                     p
                             )

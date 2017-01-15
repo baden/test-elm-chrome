@@ -188,20 +188,15 @@ waiter router =
 --     Native.Serial.connect
 
 
-connect : String -> (Int -> msg) -> Cmd msg
+connect : String -> (( String, Int ) -> msg) -> Cmd msg
 connect path target =
-    -- Task.succeed 42
-    -- Process.sleep 3000
     SLL.connect path
-        -- -- Serial.connect path
-        -- |>
-        --     Task.andThen
-        --         (\b ->
-        --             let
-        --                 _ =
-        --                     Debug.log "then" b
-        --             in
-        --                 Task.succeed 7
-        --         )
-        |>
-            Task.perform target
+        |> Task.andThen
+            (\b ->
+                let
+                    _ =
+                        Debug.log "then" b
+                in
+                    Task.succeed ( path, b )
+            )
+        |> Task.perform target

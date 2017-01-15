@@ -217,6 +217,15 @@ button, select, .control span {
     border: 1px solid #ccc;
 }
 
+button.record {
+    color: #a00;
+}
+
+button[disabled], button.record[disabled] {
+    color: gray;
+    /*opacity: 0.1;*/
+}
+
 button.colorpicker {
     padding: 2px;
     margin: 0;
