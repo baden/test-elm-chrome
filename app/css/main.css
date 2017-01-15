@@ -218,7 +218,7 @@ button, select, .control span {
     appearance: none;*/
     border: 1px solid #ccc;
     min-width: 30px;
-    border-radius: 15px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
@@ -230,7 +230,7 @@ button, select, .control span {
     height: 30px;
     min-height: 30px;
     border: 1px solid #ccc;
-    border-radius: 15px;
+    border-radius: 8px;
 }
 
 .find button, .find input {
@@ -245,6 +245,15 @@ button, select, .control span {
     margin-right: 4px;
 }
 
+.find input:hover {
+    border-bottom: 1px solid #ccc;
+}
+
+.find input:focus {
+    outline: none;
+}
+
+
 .button-group {
     padding: 0;
     margin: 0;
@@ -258,12 +267,12 @@ button, select, .control span {
 
 .button-group button:first-child {
     /*background-color: red;*/
-    border-radius: 15px 0 0 15px;
+    border-radius: 8px 0 0 8px;
 }
 
 .button-group button:last-child {
     /*background-color: red;*/
-    border-radius: 0 15px 15px 0;
+    border-radius: 0 8px 8px 0;
 }
 
 button.record {
@@ -318,37 +327,10 @@ input[type="color" i] {
     height: 28px;
     position: absolute;
     top: 0px;
-    left: -3px;
-    width: 37px;
+    left: 0px;
+    width: 28px;
 }
 
-
-span.find {
-    display: inline-block;
-    padding: 1px 4px 0px 4px;
-    /*margin: 0px;*/
-}
-
-span.find input {
-    padding: 3px 4px 1px 4px;
-    margin: 0;
-    margin-left: 8px;
-    font-size: 14px;
-    /*box-shadow: inset 0px -10px 10px -10px rgba(0,0,0,0.2);*/
-    border: none;
-    border-right: 1px solid #ccc;
-}
-
-span.find span {
-    border: none;
-}
-
-span.find span:hover {
-    /*background-color: #888;*/
-    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.2);
-    /*border: 1px solid #444;*/
-    cursor: pointer;
-}
 
 button.active {
     background: #cee3fd;
@@ -372,9 +354,9 @@ button:hover:enabled, select:hover:enabled {
     /*border: 1px solid #444;*/
 }
 
-:focus {
+/*:focus {
     outline: #666 auto 5px;
-}
+}*/
 
 
 .debug {
