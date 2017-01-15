@@ -28,26 +28,36 @@ toLeftGroup =
     style [ ( "margin-left", "-1px" ) ]
 
 
+gr =
+    div [ class "button-group" ]
+
+
 control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
         [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
-        , button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "🖈" ]
-        , button [ title "Пометить как хорошее", class "good", toLeftGroup, onClick (AddLabel LabelGood) ] [ text "🙂" ]
-        , button [ title "Пометить как плохое", class "bad", toLeftGroup, onClick (AddLabel LabelBad) ] [ text "🙁" ]
-        , button [ title "К предыдущей метке" ] [ text "⏮" ]
-        , button [ title "К следующей метке", toLeftGroup ] [ text "⏭" ]
+        , gr
+            [ button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "🖈" ]
+            , button [ title "Пометить как хорошее", class "good", toLeftGroup, onClick (AddLabel LabelGood) ] [ text "🙂" ]
+            , button [ title "Пометить как плохое", class "bad", toLeftGroup, onClick (AddLabel LabelBad) ] [ text "🙁" ]
+            ]
+        , gr
+            [ button [ title "К предыдущей метке" ] [ text "⏮" ]
+            , button [ title "К следующей метке", toLeftGroup ] [ text "⏭" ]
+            ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
-        , button [ title "Отключить автопрокрутку окна лога" ] [ text "⏸" ]
-        , button [ title "Включить автопрокрутку окна лога", disabled True, class "active", toLeftGroup ] [ text "⏵" ]
+        , gr
+            [ button [ title "Отключить автопрокрутку окна лога" ] [ text "⏸" ]
+            , button [ title "Включить автопрокрутку окна лога", disabled True, class "active", toLeftGroup ] [ text "⏵" ]
+            ]
         , button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
         , button [ title "Запись лога в облако" ] [ text "🌍" ]
-        , span [ class "find" ]
+        , div [ class "find" ]
             [ text "🔍"
             , input [ type_ "input", placeholder "Поиск" ] []
-            , span [ title "Назад" ] [ text "⏶" ]
-            , span [ title "Далее" ] [ text "⏷" ]
+            , button [ title "Назад" ] [ text "⏶" ]
+            , button [ title "Далее" ] [ text "⏷" ]
             ]
         , button [ title "Заметка" ] [ text "🗩" ]
         , button [ title "Сохранить в файл" ] [ text "💾" ]
@@ -143,33 +153,35 @@ port_view model port_ =
             , onInput (OnChangePortBoudrate port_.id)
             ]
             (listToHtmlSelectOptions fakeSpeedList)
-        , button
-            [ title "Подключить порт и начать запись лога"
-            , class
-                ("record"
-                    ++ (if not port_.connected then
-                            ""
-                        else
-                            " active"
-                       )
-                )
-            , disabled ((port_.path == "") || (port_.boudrate == ""))
-            , onClick (ConnectPort port_)
+        , gr
+            [ button
+                [ title "Подключить порт и начать запись лога"
+                , class
+                    ("record"
+                        ++ (if not port_.connected then
+                                ""
+                            else
+                                " active"
+                           )
+                    )
+                , disabled ((port_.path == "") || (port_.boudrate == ""))
+                , onClick (ConnectPort port_)
+                ]
+                [ text "⏺" ]
+            , button
+                [ title "Остановить запись лога и отключить порт"
+                , disabled (port_.path == "")
+                , class
+                    (if port_.connected then
+                        ""
+                     else
+                        "active"
+                    )
+                , toLeftGroup
+                , onClick (DisconnectPort port_)
+                ]
+                [ text "⏹" ]
             ]
-            [ text "⏺" ]
-        , button
-            [ title "Остановить запись лога и отключить порт"
-            , disabled (port_.path == "")
-            , class
-                (if port_.connected then
-                    ""
-                 else
-                    "active"
-                )
-            , toLeftGroup
-            , onClick (DisconnectPort port_)
-            ]
-            [ text "⏹" ]
         , button
             [ class "colorpicker"
             , title "Цвет текста лога"

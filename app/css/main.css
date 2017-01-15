@@ -203,11 +203,12 @@ img, a {
   padding-right: 1em;
 }*/
 
-button,select, .control span {
+button, select, .control span {
     /*padding: 4px 8px;*/
     padding: 0 6px;
     margin: 2px;
     height: 30px;
+    min-height: 30px;
     font-family: 'Open Sans Condensed', sans-serif;
     text-shadow: 0 1px 0 rgb(240, 240, 240);
     font-size: 18px;
@@ -217,9 +218,53 @@ button,select, .control span {
     appearance: none;*/
     border: 1px solid #ccc;
     min-width: 30px;
-    border-radius: 5px;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
+.find {
+    display: inline-block;
+    position: relative;
+    padding: 1px 0px 0px 8px;
+    margin: 2px;
+    height: 30px;
+    min-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+
+.find button, .find input {
+    padding: 2px 8px;
+    margin: -2px 0 0 0;
+    border: none;
+    background: none;
+}
+
+.find input {
+    border-right: 1px solid #ccc;
+    margin-right: 4px;
+}
+
+.button-group {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.button-group button {
+    /*background-color: red;*/
+    border-radius: 0;
+}
+
+.button-group button:first-child {
+    /*background-color: red;*/
+    border-radius: 15px 0 0 15px;
+}
+
+.button-group button:last-child {
+    /*background-color: red;*/
+    border-radius: 0 15px 15px 0;
+}
 
 button.record {
     color: #a00;
@@ -273,9 +318,10 @@ input[type="color" i] {
     height: 28px;
     position: absolute;
     top: 0px;
-    left: 0px;
-    width: 27px;
+    left: -3px;
+    width: 37px;
 }
+
 
 span.find {
     display: inline-block;
