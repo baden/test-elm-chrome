@@ -25,7 +25,7 @@ import Date.Format
 
 toLeftGroup : Html.Attribute msg
 toLeftGroup =
-    style [ ( "margin-left", "-3px" ) ]
+    style [ ( "margin-left", "-1px" ) ]
 
 
 control_view : Model -> Html Msg
