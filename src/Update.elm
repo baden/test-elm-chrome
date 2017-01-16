@@ -273,6 +273,7 @@ update msg model =
             model ! []
 
 
+patchPort : List a -> (a -> b) -> b -> (a -> a) -> List a
 patchPort ports cond value fun =
     ports
         |> List.map
