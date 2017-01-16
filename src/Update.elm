@@ -289,7 +289,7 @@ saveLogToFile logs =
     let
         logs_as_list =
             logs
-                |> Array.foldl
+                |> Array.foldr
                     (\l acc ->
                         ((Helpers.dateToTime l.timestamp)
                             ++ "\t"
