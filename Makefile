@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all app
 
 DIST := ./dist
 DIST_JS := $(DIST)/js/main.js
@@ -17,3 +17,7 @@ $(DIST_JS): $(SRCS) $(APP_SRC) $(NATIVES) Makefile
 	@elm-make $(MAIN) --warn --output=$@
 	cp -R ./app/* $(DIST)
 	cp -R ./src/Native $(DIST)/js
+
+app: $(DIST_JS)
+	npm i
+	node build.js

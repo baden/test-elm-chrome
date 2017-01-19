@@ -1,3 +1,6 @@
 dist/
+cache/
+node_modules/
+build/
 src/elm-stuff
 elm-stuff

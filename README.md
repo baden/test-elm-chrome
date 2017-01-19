@@ -16,6 +16,15 @@ Add `./dist` direcrory to `chrome://extensions/` as unpacked extension.
 
 Enjoy.
 
+## Build standalone app
+
+Я, блядь, ссу кипятком. Не думал что доживу до такого.
+Собираем самодостаточное кроссплатформенное, мать его, приложение.
+
+```
+    make app
+```
+
 ## Заметки на будущее
 
 Тут
