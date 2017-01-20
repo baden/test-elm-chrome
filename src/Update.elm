@@ -355,7 +355,7 @@ onClickAddLabel labelType id =
                     labelChar =
                         case labelType of
                             LabelRegular ->
-                                "🖈"
+                                "✅"
 
                             LabelGood ->
                                 "🙂"

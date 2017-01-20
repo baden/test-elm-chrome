@@ -285,6 +285,12 @@ button, select, .control span {
     border-radius: 0 8px 8px 0;
 }
 
+.button-group button:not(:first-child) {
+    /*background-color: red;*/
+    margin-left: -1px;
+}
+
+
 button.record {
     color: #a00;
 }
