@@ -35,9 +35,9 @@ gr =
 control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
-        [ button [ onClick AddPort ] [ text "🞢 Добавить порт" ]
+        [ button [ onClick AddPort ] [ text "➕ Добавить порт" ]
         , gr
-            [ button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "🖈" ]
+            [ button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "✅" ]
             , button [ title "Пометить как хорошее", class "good", toLeftGroup, onClick (AddLabel LabelGood) ] [ text "🙂" ]
             , button [ title "Пометить как плохое", class "bad", toLeftGroup, onClick (AddLabel LabelBad) ] [ text "🙁" ]
             ]
@@ -69,7 +69,7 @@ control_view model =
                     )
                 , toLeftGroup
                 ]
-                [ text "⏵" ]
+                [ text "▶️" ]
             ]
         , button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
         , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
@@ -77,10 +77,10 @@ control_view model =
         , div [ class "find" ]
             [ text "🔍"
             , input [ type_ "input", placeholder "Поиск" ] []
-            , button [ title "Назад" ] [ text "⏶" ]
-            , button [ title "Далее" ] [ text "⏷" ]
+            , button [ title "Назад" ] [ text "🔼" ]
+            , button [ title "Далее" ] [ text "🔽" ]
             ]
-        , button [ title "Заметка" ] [ text "🗩" ]
+        , button [ title "Заметка" ] [ text "ℹ️" ]
         , button [ title "Сохранить в файл", onClick SaveLogToFile ] [ text "💾" ]
           -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
         , button [ title "Настройки" ] [ text "🛠" ]
