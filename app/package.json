@@ -3,14 +3,15 @@
     "version": "0.0.1",
     "main": "index.html",
     "window": {
-        "width": 1024,
-        "height": 512,
+        "width": 980,
+        "height": 600,
         "bounds": {
             "width": 980,
             "height": 600
         },
-        "minWidth": 512,
-        "minHeight": 256
+        "min_width": 512,
+        "min_height": 256,
+        "icon": "images/search-128.png"
     },
     "webkit": {
         "plugin": true,
