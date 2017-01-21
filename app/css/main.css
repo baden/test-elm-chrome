@@ -104,6 +104,30 @@ pre.log p {
     padding: 0;
 }
 
+.horizontal > div {
+    margin: 0 1px;
+    padding: 1px 4px;
+    /*border: 1px solid #ccc;*/
+    box-shadow: inset 0px 0px 4px rgba(127,127,127,0.5);
+}
+
+.horizontal > div:first-child {
+    margin-left: -1px;
+}
+
+.horizontal > div:last-child {
+    margin-right: -1px;
+}
+
+.horizontal .fill {
+    position: relative;
+    -webkit-flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* word-break: break-all; */
+    white-space: nowrap;
+}
+
 
 pre.log p a {
     position: relative;
@@ -148,6 +172,19 @@ pre.log p span.content {
     text-overflow: ellipsis;
     /* word-break: break-all; */
     white-space: nowrap;
+}
+
+.hint {
+    position: absolute;
+    pointer-events: none;
+    width: 80px;
+    height: 30px;
+    left: 20px;
+    top: 100px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 2px 10px rgba(0,0,0,0.2);
+    background-color: white;
 }
 
 
@@ -220,6 +257,10 @@ button, select, .control span {
     min-width: 30px;
     border-radius: 8px;
     overflow: hidden;
+}
+
+button:disabled {
+    opacity: 0.5;
 }
 
 .find, .label {
@@ -383,12 +424,22 @@ button:hover:enabled, select:hover:enabled {
     width: 300px;
     height: 170px;
     right: 30px;
-    bottom: 20px;
+    bottom: 40px;
     overflow: scroll;
     box-shadow: 1px 1px 10px rgba(0,0,0,0.3);
     background-color: white;
     opacity: 0.8;
 }
+
+.statusbar {
+    margin: 0;
+    padding: 2px 4px;
+    /*border-bottom: 1px solid rgba(0,0,0, 0.5);*/
+    position: relative;
+    /*opacity: 0.7;*/
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
 
 select {
   max-width: 160px;

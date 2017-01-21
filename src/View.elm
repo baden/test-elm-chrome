@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html, div, button, text, p, node, input)
-import Html.Attributes exposing (class, title, type_, placeholder)
+import Html.Attributes exposing (class, title, type_, placeholder, disabled)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
@@ -12,6 +12,7 @@ import Types
         )
 import Port.View
 import Log.View
+import Array exposing (Array)
 
 
 -- import Time
@@ -32,8 +33,8 @@ control_view model =
             , button [ title "Пометить как плохое", class "bad", onClick (AddLabel LabelBad) ] [ text "🙁" ]
             ]
         , gr
-            [ button [ title "К предыдущей метке" ] [ text "⏮" ]
-            , button [ title "К следующей метке" ] [ text "⏭" ]
+            [ button [ title "К предыдущей метке", onClick ToPrevLabel, disabled (model.active_label <= 1) ] [ text "⏮" ]
+            , button [ title "К следующей метке", onClick ToNextLabel, disabled (model.active_label == Array.length model.labels) ] [ text "⏭" ]
             ]
         , button [ title "Запустить секундомер" ] [ text "⏱" ]
         , gr
@@ -115,6 +116,7 @@ debug_view : Model -> Html Msg
 debug_view model =
     div [ class "debug" ]
         [ p [] [ text (toString model.ports) ]
+        , p [] [ text (toString model.labels) ]
         ]
 
 
@@ -128,10 +130,29 @@ view model =
                 , Port.View.ports_view model model.ports
                 ]
             , Log.View.log_view model
+            , statusbar_view model
             ]
+        , hint_view model.hint
         , debug_view model
         , stylesheet model
         ]
+
+statusbar_view : Model -> Html Msg
+statusbar_view model =
+    div [ class "statusbar" ]
+        [ div
+            [class "horizontal"] [
+                div [] [text ("Log lines: " ++ (toString (Array.length model.logs)))]
+                , div [] [text ("Labels: " ++ (toString model.active_label) ++ "/" ++ (toString (Array.length model.labels)))]
+                , div [class "fill"] [text "Main"]
+                , div [] [text "End"]
+            ]
+        ]
+
+hint_view : String -> Html Msg
+hint_view hint =
+    div [ class "hint" ]
+    [ text hint ]
 
 
 stylesheet : Model -> Html Msg

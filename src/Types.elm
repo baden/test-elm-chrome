@@ -33,11 +33,14 @@ type alias Model =
     , time : Time.Time
     , debug : String
     , logs : Array LogLine
+    , labels : Array Int
+    , active_label : Int
     , last_timestamp : Date.Date
     , last_labelid : Int
     , shouldScroll : Bool
     , autoscroll : Bool
     , scrollEvent : OnScrollEvent
+    , hint : String
     }
 
 
@@ -49,11 +52,14 @@ initModel =
     , time = 0
     , debug = ""
     , logs = Array.empty
+    , labels = Array.empty
+    , active_label = 0
     , last_timestamp = Date.fromTime 0
     , last_labelid = 0
     , shouldScroll = False
     , autoscroll = True
     , scrollEvent = OnScrollEvent 0 0 0
+    , hint = "Бульк"
     }
 
 
@@ -83,6 +89,8 @@ type Msg
     | Tick Time.Time
     | SetSerialDevices (List Serial.Port)
     | AddLabel LabelType
+    | ToNextLabel
+    | ToPrevLabel
     | AddLogLine LogLine
     | ClearLog
     | EnableScroll Bool

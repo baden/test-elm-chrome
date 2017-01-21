@@ -134,7 +134,24 @@ update msg model =
                 id =
                     model.last_labelid + 1
             in
-                ( { model | last_labelid = id }, onClickAddLabel labelType id )
+                ( { model
+                    | last_labelid = id
+                    , labels = model.labels |> Array.push (Array.length model.logs)
+                  }
+                , onClickAddLabel labelType id
+                )
+
+        ToNextLabel ->
+            let
+                active_label = model.active_label + 1
+            in
+                {model | active_label = active_label} ! []
+
+        ToPrevLabel ->
+            let
+                active_label = model.active_label - 1
+            in
+                {model | active_label = active_label} ! []
 
         AddLogLine logLine ->
             let
