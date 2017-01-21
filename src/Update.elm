@@ -56,6 +56,12 @@ scrollToBottom scroll =
             Cmd.none
 
 
+scrollToLine : Int -> Cmd Msg
+scrollToLine line =
+            Dom.Scroll.toY "log" (toFloat (line * 25)) --logLineHeight
+                |> Task.attempt (always NoOp)
+
+
 onScroll : (OnScrollEvent -> msg) -> Html.Attribute msg
 onScroll tagger =
     Json.Decode.map tagger onScrollJsonParser
@@ -144,19 +150,27 @@ update msg model =
         ToNextLabel ->
             let
                 active_label = model.active_label + 1
+                line = case Array.get (active_label-1) model.labels of
+                    Just value -> value
+                    _ -> 0
+                _ = Debug.log "to line" line
             in
-                {model | active_label = active_label} ! []
+                {model | active_label = active_label} ! [scrollToLine line]
 
         ToPrevLabel ->
             let
                 active_label = model.active_label - 1
+                line = case Array.get (active_label-1) model.labels of
+                    Just value -> value
+                    _ -> 0
+                _ = Debug.log "to line" line
             in
-                {model | active_label = active_label} ! []
+                {model | active_label = active_label} ! [scrollToLine line]
 
         AddLogLine logLine ->
             let
-                _ =
-                    Debug.log "AddLogLine" logLine
+                -- _ =
+                --     Debug.log "AddLogLine" logLine
 
                 prev_timestamp =
                     dateToUnixtime model.last_timestamp
@@ -229,17 +243,17 @@ update msg model =
             { model | ports = patchPort model.ports .id port_id (\p -> { p | boudrate = value }) } ! []
 
         OnPortReceive ev_line ->
-            let
-                _ =
-                    Debug.log "On port message" ev_line
-            in
+            -- let
+            --     _ =
+            --         Debug.log "On port message" ev_line
+            -- in
                 model ! [ addPortMsg ev_line.id ev_line.data ]
 
         OnPortReceiveError ev_line ->
-            let
-                _ =
-                    Debug.log "On port error message" ev_line
-            in
+            -- let
+            --     _ =
+            --         Debug.log "On port error message" ev_line
+            -- in
                 model ! [ addPortMsg ev_line.id ev_line.data ]
 
         RemovePort id ->

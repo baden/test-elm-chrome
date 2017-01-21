@@ -67,7 +67,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
             chrome.serial.onReceive.addListener(function(info){
                 var cid = info.connectionId;
                 var as_string = ab2str(info.data);
-                console.log("port on receive", [info, as_string]);
+                // console.log("port on receive", [info, as_string]);
 
                 // TODO: Это все нужно вынести в Elm
 
@@ -85,7 +85,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
                     lineBuffers[cid] = lineBuffers[cid].substr(index + 1);
 
                     if(line.length > 0) {
-                		console.log("log", [line]);
+                		// console.log("log", [line]);
 
                 		var uri;
                 		try{
@@ -119,7 +119,7 @@ var _baden$test_elm_chrome$Native_Serial = function() {
             });
 
             chrome.serial.onReceiveError.addListener(function(info){
-                console.log("port on receiveError", [info]);
+                // console.log("port on receiveError", [info]);
                 var data = {id: 2, data: "Fake error string"};
                 var task = settings.onReceiveError(data);
                 _elm_lang$core$Native_Scheduler.rawSpawn(task);

@@ -30,7 +30,7 @@ var fakeSerial = (function(){
                     , data : new ArrayBuffer ("test")
                 };
                 callback(data);
-            }, 10000);
+            }, 1000);
 
         }
     };
@@ -45,7 +45,7 @@ var fakeSerial = (function(){
                     , data : new ArrayBuffer ("test")
                 };
                 callback(data);
-            }, 15000);
+            }, 1500);
 
         }
     };

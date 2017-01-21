@@ -77,19 +77,19 @@ onSelfMsg :
     -> State msg
     -> Task Never (State msg)
 onSelfMsg router selfMsg state =
-    let
-        _ =
-            Debug.log
-                ("Serial:onSelfMsg"
-                    ++ "\n  router"
-                    ++ toString (router)
-                    ++ "\n  selfMsg"
-                    ++ toString (selfMsg)
-                    ++ "\n  state"
-                    ++ toString (state)
-                )
-                0
-    in
+    -- let
+    --     _ =
+    --         Debug.log
+    --             ("Serial:onSelfMsg"
+    --                 ++ "\n  router"
+    --                 ++ toString (router)
+    --                 ++ "\n  selfMsg"
+    --                 ++ toString (selfMsg)
+    --                 ++ "\n  state"
+    --                 ++ toString (state)
+    --             )
+    --             0
+    -- in
         case selfMsg of
             Receive event ->
                 case state of
@@ -126,19 +126,19 @@ onEffects :
 onEffects router subs state =
     case state of
         Nothing ->
-            let
-                _ =
-                    Debug.log
-                        ("Serial:onEffects"
-                            ++ "\n     router"
-                            ++ toString (router)
-                            ++ "\n     subs"
-                            ++ toString (subs)
-                            ++ "\n     state"
-                            ++ toString (state)
-                        )
-                        0
-            in
+            -- let
+            --     _ =
+            --         Debug.log
+            --             ("Serial:onEffects"
+            --                 ++ "\n     router"
+            --                 ++ toString (router)
+            --                 ++ "\n     subs"
+            --                 ++ toString (subs)
+            --                 ++ "\n     state"
+            --                 ++ toString (state)
+            --             )
+            --             0
+            -- in
                 case subs of
                     [] ->
                         Task.succeed state
@@ -164,18 +164,18 @@ waiter router =
     SLL.waitMessage
         { onReceive =
             (\msg ->
-                let
-                    _ =
-                        Debug.log "waiter Receive Msg: " msg
-                in
+                -- let
+                --     _ =
+                --         Debug.log "waiter Receive Msg: " msg
+                -- in
                     Platform.sendToSelf router (Receive msg)
             )
         , onReceiveError =
             (\msg ->
-                let
-                    _ =
-                        Debug.log "waiter ReceiveError Msg: " msg
-                in
+                -- let
+                --     _ =
+                --         Debug.log "waiter ReceiveError Msg: " msg
+                -- in
                     Platform.sendToSelf router (ReceiveError msg)
             )
         }
