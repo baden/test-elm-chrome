@@ -13,7 +13,7 @@ import Types
 import Port.View
 import Log.View
 import Array exposing (Array)
-
+import Json.Decode
 
 -- import Time
 
@@ -66,7 +66,12 @@ control_view model =
         , button [ title "Запись лога в облако" ] [ text "🌍" ]
         , div [ class "find" ]
             [ text "🔍"
-            , input [ type_ "input", placeholder "Поиск" ] []
+            , input [ type_ "input"
+                , placeholder "Поиск"
+                , onInput EnterFindText
+                , onKeyDown PressKeyOnFind
+                ]
+                []
             , button [ title "Назад" ] [ text "🔼" ]
             , button [ title "Далее" ] [ text "🔽" ]
             ]
@@ -78,37 +83,9 @@ control_view model =
 
 
 
-
--- resetFavicon : Cmd Msg
--- resetFavicon =
---     Cmd.map (always Noop)
---         << Task.perform Err Ok
---     <|
---         (Serial.set ("/public/images/favicon.png"))
--- fakeLog : List String
--- fakeLog =
---     List.repeat 10000 "Log"
-
-
-
-
-
--- log_view : Model -> Html Msg
--- log_view model =
---     div [ class "log", id "log", onScroll ChatScrolled, onScroll ChatScrolled ]
---         [ model.logs
---             |> List.foldl (\d acc -> log_row d :: acc) []
---             |> pre [ class "log" ]
---         ]
-
-
-
-
--- |> Array.toList
--- |> List.map f
-
-
-
+onKeyDown : (Int -> msg) -> Html.Attribute msg
+onKeyDown tagger =
+    Html.Events.on "keydown" (Json.Decode.map tagger Html.Events.keyCode)
 
 
 
@@ -117,6 +94,9 @@ debug_view model =
     div [ class "debug" ]
         [ p [] [ text (toString model.ports) ]
         , p [] [ text (toString model.labels) ]
+        , p [] [ text (toString model.findText) ]
+        , p [] [ text (toString model.findIndex) ]
+        , p [] [ text (toString model.findResults) ]
         ]
 
 
@@ -144,6 +124,7 @@ statusbar_view model =
             [class "horizontal"] [
                 div [] [text ("Log lines: " ++ (toString (Array.length model.logs)))]
                 , div [] [text ("Labels: " ++ (toString model.active_label) ++ "/" ++ (toString (Array.length model.labels)))]
+                , div [] [text ("Finds: " ++ (toString model.findIndex) ++ "/" ++ (toString (Array.length model.findResults)))]
                 , div [class "fill"] [text "Main"]
                 , div [] [text "End"]
             ]

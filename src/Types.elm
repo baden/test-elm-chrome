@@ -41,6 +41,9 @@ type alias Model =
     , autoscroll : Bool
     , scrollEvent : OnScrollEvent
     , hint : String
+    , findText : Maybe String
+    , findIndex : Maybe Int
+    , findResults : Array Int
     }
 
 
@@ -60,6 +63,9 @@ initModel =
     , autoscroll = True
     , scrollEvent = OnScrollEvent 0 0 0
     , hint = "Бульк"
+    , findText = Nothing
+    , findIndex = Nothing
+    , findResults = Array.empty
     }
 
 
@@ -98,6 +104,8 @@ type Msg
     | SaveLogToFile
     | SaveLogDone String
     | ChatScrolled OnScrollEvent
+    | EnterFindText String
+    | PressKeyOnFind Int
 
 
 type alias OnScrollEvent =

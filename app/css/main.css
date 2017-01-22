@@ -431,6 +431,11 @@ button:hover:enabled, select:hover:enabled {
     opacity: 0.8;
 }
 
+.debug p {
+    margin: 0;
+    padding: 0;
+}
+
 .statusbar {
     margin: 0;
     padding: 2px 4px;

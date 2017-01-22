@@ -300,8 +300,38 @@ update msg model =
         SaveLogDone _ ->
             model ! []
 
+        EnterFindText text ->
+            {model | findText = Just text, findIndex = Nothing} ! []
+
+        PressKeyOnFind key ->
+            if key == 13 then
+                case model.findIndex of
+                    Nothing ->
+                        let
+                            text = model.findText |> Maybe.withDefault ""
+
+                            f : LogLine -> (Int, Array Int) -> (Int, Array Int)
+                            f =
+                                \d (index, acc) ->
+                                    if String.contains text d.data then
+                                        (index+1, Array.push index acc)
+                                    else
+                                        (index+1, acc)
+
+                            (_, results) = model.logs
+                                |> Array.foldl f (0, Array.empty)
+                        in
+                        { model | findResults = results } ! []
+                    Just index ->
+                        { model | findText = Nothing } ! []
+            else
+                model ! []
+
+
         NoOp ->
             model ! []
+
+
 
 
 patchPort : List a -> (a -> b) -> b -> (a -> a) -> List a
