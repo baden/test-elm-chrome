@@ -20,16 +20,50 @@ var fakeSerial = (function(){
         return callback(ports);
     };
 
+    lorem = ("Lorem ipsum dolor sit amet, consectetur adipisicing elit,"
+    + " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    + " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"
+    + " nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in"
+    + " reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla"
+    + " pariatur. Excepteur sint occaecat cupidatat non proident, sunt in"
+    + " culpa qui officia deserunt mollit anim id est laborum.").split(" ");
+
+    function rand_word() {
+        var r = Math.random() * lorem.length | 0;
+        return lorem[r];
+    }
+
+    function rand_verb() {
+        return "" + rand_word() + " "
+        + rand_word() + " "
+        + rand_word() + " "
+        + rand_word() + " "
+        + rand_word() + " "
+        + rand_word() + ".\r";
+    }
+
+    function str2ab(str) {
+      var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+      var bufView = new Uint16Array(buf);
+      for (var i=0, strLen=str.length; i<strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      }
+      return buf;
+    }
+
     var onReceive = {
         addListener : function(callback) {
             var counter = 0;
             var id = setInterval(function(){
-                counter += 1;
-                var data = {
-                    connectionId: 42
-                    , data : new ArrayBuffer ("test")
-                };
-                callback(data);
+                for(var cid in cids) {
+                    // console.log("cid=", cid);
+                    var data = {
+                        connectionId: cid | 0
+                        , data : str2ab(rand_verb())
+                    };
+                    callback(data);
+                }
+                // counter += 1;
             }, 1000);
 
         }
@@ -37,25 +71,26 @@ var fakeSerial = (function(){
 
     var onReceiveError = {
         addListener : function(callback) {
-            var counter = 0;
-            var id = setInterval(function(){
-                counter += 1;
-                var data = {
-                    connectionId: 42
-                    , data : new ArrayBuffer ("test")
-                };
-                callback(data);
-            }, 1500);
-
+            // var counter = 0;
+            // var id = setInterval(function(){
+            //     counter += 1;
+            //     var data = {
+            //         connectionId: 42
+            //         , data : new ArrayBuffer ("test")
+            //     };
+            //     callback(data);
+            // }, 5000);
         }
     };
 
     var cid = 42;
+    var cids = {};
 
     var connect = function(path, options, callback) {
         var data = {
             connectionId: cid
         };
+        cids[cid] = true;
         cid += 1;
         callback(data);
     };
