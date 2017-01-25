@@ -15,6 +15,7 @@ import Log.View
 import Array exposing (Array)
 import Json.Decode
 
+
 -- import Time
 
 
@@ -66,14 +67,25 @@ control_view model =
         , button [ title "Запись лога в облако" ] [ text "🌍" ]
         , div [ class "find" ]
             [ text "🔍"
-            , input [ type_ "input"
+            , input
+                [ type_ "input"
                 , placeholder "Поиск"
                 , onInput EnterFindText
                 , onKeyDown PressKeyOnFind
                 ]
                 []
-            , button [ title "Назад" ] [ text "🔼" ]
-            , button [ title "Далее" ] [ text "🔽" ]
+            , button
+                [ title "Назад"
+                , onClick PrevFindResult
+                , disabled (model.findIndex <= 1)
+                ]
+                [ text "🔼" ]
+            , button
+                [ title "Далее"
+                , onClick NextFindResult
+                , disabled (model.findIndex >= Array.length model.findResults)
+                ]
+                [ text "🔽" ]
             ]
         , button [ title "Заметка" ] [ text "ℹ️" ]
         , button [ title "Сохранить в файл", onClick SaveLogToFile ] [ text "💾" ]
@@ -82,11 +94,9 @@ control_view model =
         ]
 
 
-
 onKeyDown : (Int -> msg) -> Html.Attribute msg
 onKeyDown tagger =
     Html.Events.on "keydown" (Json.Decode.map tagger Html.Events.keyCode)
-
 
 
 debug_view : Model -> Html Msg
@@ -117,23 +127,25 @@ view model =
         , stylesheet model
         ]
 
+
 statusbar_view : Model -> Html Msg
 statusbar_view model =
     div [ class "statusbar" ]
         [ div
-            [class "horizontal"] [
-                div [] [text ("Log lines: " ++ (toString (Array.length model.logs)))]
-                , div [] [text ("Labels: " ++ (toString model.active_label) ++ "/" ++ (toString (Array.length model.labels)))]
-                , div [] [text ("Finds: " ++ (toString model.findIndex) ++ "/" ++ (toString (Array.length model.findResults)))]
-                , div [class "fill"] [text "Main"]
-                , div [] [text "End"]
+            [ class "horizontal" ]
+            [ div [] [ text ("Строк лога: " ++ (toString (Array.length model.logs))) ]
+            , div [] [ text ("Метка: " ++ (toString model.active_label) ++ "/" ++ (toString (Array.length model.labels))) ]
+            , div [] [ text ("Результат поиска: " ++ (toString model.findIndex) ++ "/" ++ (toString (Array.length model.findResults))) ]
+            , div [ class "fill" ] [ text "Тут могла бы быть ваша реклама." ]
+            , div [] [ text "©2017 Денис Батрак (baden.i.ua@gmail.com)" ]
             ]
         ]
+
 
 hint_view : String -> Html Msg
 hint_view hint =
     div [ class "hint" ]
-    [ text hint ]
+        [ text hint ]
 
 
 stylesheet : Model -> Html Msg

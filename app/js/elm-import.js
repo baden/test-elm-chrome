@@ -34,12 +34,12 @@ var fakeSerial = (function(){
     }
 
     function rand_verb() {
-        return "" + rand_word() + " "
-        + rand_word() + " "
-        + rand_word() + " "
-        + rand_word() + " "
-        + rand_word() + " "
-        + rand_word() + ".\r";
+        return "" + rand_word() + " " +
+        rand_word() + " " +
+        rand_word() + " " +
+        rand_word() + " " +
+        rand_word() + " " +
+        rand_word() + ".\r";
     }
 
     function str2ab(str) {
@@ -64,7 +64,7 @@ var fakeSerial = (function(){
                     callback(data);
                 }
                 // counter += 1;
-            }, 1000);
+            }, 250);
 
         }
     };

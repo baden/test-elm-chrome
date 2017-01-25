@@ -42,7 +42,7 @@ type alias Model =
     , scrollEvent : OnScrollEvent
     , hint : String
     , findText : Maybe String
-    , findIndex : Maybe Int
+    , findIndex : Int
     , findResults : Array Int
     }
 
@@ -64,7 +64,7 @@ initModel =
     , scrollEvent = OnScrollEvent 0 0 0
     , hint = "Бульк"
     , findText = Nothing
-    , findIndex = Nothing
+    , findIndex = 0
     , findResults = Array.empty
     }
 
@@ -106,6 +106,8 @@ type Msg
     | ChatScrolled OnScrollEvent
     | EnterFindText String
     | PressKeyOnFind Int
+    | NextFindResult
+    | PrevFindResult
 
 
 type alias OnScrollEvent =
