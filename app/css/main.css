@@ -456,6 +456,15 @@ select {
   */
 }
 
+mark {
+    background-color: burlywood;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: -2px;
+    margin-right: -2px;
+    border-radius: 6px;
+}
+
 /*select > option * {
     padding: 4px 8px;
 }*/

@@ -1,6 +1,6 @@
 module Log.View exposing (..)
 
-import Html exposing (Html, div, pre, p, text, span, a)
+import Html exposing (Html, div, pre, p, text, span, a, mark)
 import Html.Attributes exposing (class, id, style)
 import Array exposing (Array)
 import Update exposing (onScroll)
@@ -34,13 +34,19 @@ log_view model =
 
         stop =
             min logSize ((round (startLine + lines)) + 10)
+
+        hightlight =
+            if model.findIndex == 0 then
+                Nothing
+            else
+                model.findText
     in
         div
             [ class "log"
             , id "log"
             , onScroll ChatScrolled
             ]
-            [ sliceLog start stop model.logs
+            [ sliceLog start stop hightlight model.logs
                 |> pre
                     [ class "log"
                     , style [ ( "height", (toString ((toFloat logSize) * logLineHeight)) ++ "px" ) ]
@@ -48,13 +54,13 @@ log_view model =
             ]
 
 
-sliceLog : Int -> Int -> Array LogLine -> List (Html Msg)
-sliceLog start stop logs =
+sliceLog : Int -> Int -> Maybe String -> Array LogLine -> List (Html Msg)
+sliceLog start stop hightlight logs =
     -- [ ("Show from " ++ (toString start) ++ " to " ++ (toString stop)) ]
     let
         f : LogLine -> ( Int, List (Html Msg) ) -> ( Int, List (Html Msg) )
         f =
-            \d ( index, acc ) -> ( index + 1, log_row d index :: acc )
+            \d ( index, acc ) -> ( index + 1, log_row d index hightlight :: acc )
     in
         Array.slice start stop logs
             |> Array.foldl f ( start, [] )
@@ -65,8 +71,9 @@ logLineHeight : Float
 logLineHeight =
     25
 
-log_row : LogLine -> Int -> Html Msg
-log_row l offset =
+
+log_row : LogLine -> Int -> Maybe String -> Html Msg
+log_row l offset hightlight =
     p
         [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ]
         , class (logClassName l)
@@ -81,9 +88,38 @@ log_row l offset =
             [ a [] [ text (toString (offset + 1)) ]
             , span [ class "time" ] [ text (Helpers.dateToTime l.timestamp) ]
             , span [ class "delta" ] [ text (Helpers.deltaAsString l.delta) ]
-            , span [ class "content" ] [ text l.data ]
+            , span [ class "content" ] (maybeHiglight l.data hightlight)
             ]
         ]
+
+
+maybeHiglight : String -> Maybe String -> List (Html msg)
+maybeHiglight data hightlight =
+    case hightlight of
+        Nothing ->
+            [ text data ]
+
+        Just markit ->
+            if String.contains markit data then
+                let
+                    parts =
+                        String.split markit data
+                in
+                    marks markit parts
+            else
+                [ text data ]
+
+
+marks markit parts =
+    case parts of
+        p1 :: [] ->
+            [ text p1 ]
+
+        p1 :: rest ->
+            [ text p1, mark [] [ text markit ] ] ++ (marks markit rest)
+
+        [] ->
+            []
 
 
 logClassName : LogLine -> String

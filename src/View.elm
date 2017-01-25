@@ -122,7 +122,7 @@ view model =
             , Log.View.log_view model
             , statusbar_view model
             ]
-        , hint_view model.hint
+          -- , hint_view model.hint
         , debug_view model
         , stylesheet model
         ]
