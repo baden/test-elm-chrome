@@ -110,6 +110,7 @@ maybeHiglight data hightlight =
                 [ text data ]
 
 
+marks : String -> List String -> List (Html msg)
 marks markit parts =
     case parts of
         p1 :: [] ->
