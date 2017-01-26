@@ -235,7 +235,15 @@ update msg model =
                                 ! [ scrollToBottom model.autoscroll ]
 
         ClearLog ->
-            { model | logs = Array.empty }
+            { model
+                | logs = Array.empty
+                , labels = Array.empty
+                , active_label = 0
+                , last_labelid = 0
+                , findResults = Array.empty
+                , findIndex = 0
+                , hint = "Очищено"
+            }
                 ! [ scrollToBottom True ]
 
         ConnectPort port_ ->
