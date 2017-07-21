@@ -90,7 +90,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     model.ports
-        |> List.map (\c -> Html.map (PortMessage c.id) (Port.view c))
+        |> List.map
+            (\c ->
+                Port.view c
+                    |> Html.map (PortMessage c.id)
+            )
         |> div [ class "port_list" ]
 
 
