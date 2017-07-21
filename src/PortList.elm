@@ -22,9 +22,12 @@ defaultModel =
 
 
 type Msg
-    = PortMessage Port.Msg
+    = PortMessage Int Port.Msg
     | AddPort
-    | RemovePort Int
+
+
+
+-- | RemovePort Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -34,12 +37,32 @@ update msg model =
             Debug.log "PortList:Update" ( msg, model )
     in
         case msg of
-            PortMessage subMsg ->
+            PortMessage id (Port.RemovePort _) ->
+                { model | ports = List.filter (\t -> t.id /= id) model.ports }
+                    ! []
+
+            PortMessage id subMsg ->
                 let
+                    f : Port.Model -> ( List Port.Model, List (Cmd Msg) ) -> ( List Port.Model, List (Cmd Msg) )
+                    f =
+                        \p ( ports, cmds ) ->
+                            if p.id == id then
+                                let
+                                    ( newPort, subCmd ) =
+                                        Port.update subMsg p
+                                in
+                                    ( newPort :: ports, [] )
+                            else
+                                ( p :: ports, [] )
+
+                    ( newPorts, cmds ) =
+                        model.ports
+                            |> List.foldr f ( [], [] )
+
                     _ =
-                        Debug.log "  ****=>  PortList.update:PortMessage" subMsg
+                        Debug.log "  ****=>  PortList.update:PortMessage" ( id, subMsg )
                 in
-                    model ! []
+                    { model | ports = newPorts } ! []
 
             AddPort ->
                 let
@@ -53,19 +76,21 @@ update msg model =
                         | uid = model.uid + 1
                         , ports = model.ports ++ [ port_ ]
                     }
-                        ! [ Cmd.map PortMessage subCmd ]
+                        ! [ Cmd.map (PortMessage id) subCmd ]
 
-            -- !
-            --     []
-            RemovePort id ->
-                { model | ports = List.filter (\t -> t.id /= id) model.ports }
-                    ! []
+
+
+-- !
+--     []
+-- RemovePort id ->
+--     { model | ports = List.filter (\t -> t.id /= id) model.ports }
+--         ! []
 
 
 view : Model -> Html Msg
 view model =
     model.ports
-        |> List.map (\c -> Html.map PortMessage (Port.view c))
+        |> List.map (\c -> Html.map (PortMessage c.id) (Port.view c))
         |> div [ class "port_list" ]
 
 

@@ -32,7 +32,8 @@ type Msg
     | DisconnectPort
     | PortConnected ( String, Int )
     | PortDisconnected ( Int, Bool )
-    | SetSerialDevices ( Int, List Serial.Port )
+    | SetSerialDevices (List Serial.Port)
+    | RemovePort Int
 
 
 
@@ -105,13 +106,10 @@ update msg model =
                 -- }
                 { model | connected = False, cid = 0 } ! []
 
-            SetSerialDevices ( id, ports ) ->
+            SetSerialDevices ports ->
                 let
                     _ =
-                        Debug.log "SetSerialDevices" ( id, ports )
-
-                    _ =
-                        Debug.log "  ID" id
+                        Debug.log "########### = SetSerialDevices" ports
 
                     _ =
                         Debug.log "  model" model
@@ -120,6 +118,10 @@ update msg model =
                         Debug.log "  ports" ports
                 in
                     ( { model | portList = ports }, Cmd.none )
+
+            -- TODO: Dirty hack
+            RemovePort id ->
+                model ! []
 
 
 toSelectOption : String -> Html a
@@ -250,7 +252,7 @@ view model =
                 [ title "Удалить"
                 , disabled (model.connected)
                   -- TODO: restore
-                  -- , onClick (RemovePort port_.id)
+                , onClick (RemovePort model.id)
                 ]
                 [ text "🚮" ]
               -- 🞩
@@ -284,12 +286,13 @@ getSerialDevices : Int -> Cmd Msg
 getSerialDevices id =
     -- Time.now
     Serial.getDevices
-        |> Task.andThen
-            (\b ->
-                let
-                    _ =
-                        Debug.log "getSerialDevices->then" b
-                in
-                    Task.succeed ( id, b )
-            )
-        |> Task.perform SetSerialDevices
+        -- |> Task.andThen
+        --     (\b ->
+        --         let
+        --             _ =
+        --                 Debug.log "getSerialDevices->then" b
+        --         in
+        --             Task.succeed ( id, b )
+        --     )
+        |>
+            Task.perform SetSerialDevices

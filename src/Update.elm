@@ -124,250 +124,250 @@ onScrollJsonParser =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        _ =
-            Debug.log "Update" ( msg, model )
-    in
-        case msg of
-            AddLabel labelType ->
-                let
-                    id =
-                        model.last_labelid + 1
-                in
-                    ( { model
-                        | last_labelid = id
-                        , labels = model.labels |> Array.push (Array.length model.logs)
-                      }
-                    , onClickAddLabel labelType id
-                    )
+    -- let
+    --     _ =
+    --         Debug.log "Update" ( msg, model )
+    -- in
+    case msg of
+        AddLabel labelType ->
+            let
+                id =
+                    model.last_labelid + 1
+            in
+                ( { model
+                    | last_labelid = id
+                    , labels = model.labels |> Array.push (Array.length model.logs)
+                  }
+                , onClickAddLabel labelType id
+                )
 
-            ToNextLabel ->
-                let
-                    active_label =
-                        model.active_label + 1
+        ToNextLabel ->
+            let
+                active_label =
+                    model.active_label + 1
 
-                    line =
-                        case Array.get (active_label - 1) model.labels of
-                            Just value ->
-                                value
-
-                            _ ->
-                                0
-
-                    -- _ =
-                    --     Debug.log "to line" line
-                in
-                    { model | active_label = active_label } ! [ scrollToLine line ]
-
-            ToPrevLabel ->
-                let
-                    active_label =
-                        model.active_label - 1
-
-                    line =
-                        case Array.get (active_label - 1) model.labels of
-                            Just value ->
-                                value
-
-                            _ ->
-                                0
-
-                    -- _ =
-                    --     Debug.log "to line" line
-                in
-                    { model | active_label = active_label } ! [ scrollToLine line ]
-
-            AddLogLine logLine ->
-                let
-                    -- _ =
-                    --     Debug.log "AddLogLine" logLine
-                    prev_timestamp =
-                        dateToUnixtime model.last_timestamp
-
-                    log_timestamp =
-                        dateToUnixtime logLine.timestamp
-
-                    delta =
-                        log_timestamp - prev_timestamp
-
-                    new_logs =
-                        Array.push
-                            { logLine
-                                | delta = delta
-                            }
-                            model.logs
-                in
-                    case model.findIndex of
-                        0 ->
-                            { model
-                                | logs = new_logs
-                                , last_timestamp = logLine.timestamp
-                            }
-                                ! [ scrollToBottom model.autoscroll ]
+                line =
+                    case Array.get (active_label - 1) model.labels of
+                        Just value ->
+                            value
 
                         _ ->
-                            let
-                                index =
-                                    (Array.length new_logs) - 1
+                            0
 
-                                text =
-                                    model.findText |> Maybe.withDefault ""
+                -- _ =
+                --     Debug.log "to line" line
+            in
+                { model | active_label = active_label } ! [ scrollToLine line ]
 
-                                findResults =
-                                    if String.contains text logLine.data then
-                                        Array.push index model.findResults
-                                    else
-                                        model.findResults
-                            in
-                                { model
-                                    | logs = new_logs
-                                    , last_timestamp = logLine.timestamp
-                                    , findResults = findResults
-                                }
-                                    ! [ scrollToBottom model.autoscroll ]
+        ToPrevLabel ->
+            let
+                active_label =
+                    model.active_label - 1
 
-            ClearLog ->
-                { model
-                    | logs = Array.empty
-                    , labels = Array.empty
-                    , active_label = 0
-                    , last_labelid = 0
-                    , findResults = Array.empty
-                    , findIndex = 0
-                    , hint = "Очищено"
-                }
-                    ! [ scrollToBottom True ]
+                line =
+                    case Array.get (active_label - 1) model.labels of
+                        Just value ->
+                            value
 
-            OnPortReceive ev_line ->
-                -- let
-                --     _ =
-                --         Debug.log "On port message" ev_line
-                -- in
-                model ! [ addPortMsg ev_line.id ev_line.data ]
+                        _ ->
+                            0
 
-            OnPortReceiveError ev_line ->
-                -- let
-                --     _ =
-                --         Debug.log "On port error message" ev_line
-                -- in
-                model ! [ addPortMsg ev_line.id ev_line.data ]
+                -- _ =
+                --     Debug.log "to line" line
+            in
+                { model | active_label = active_label } ! [ scrollToLine line ]
 
-            PortListMessage subMsg ->
-                let
-                    _ =
-                        Debug.log "Update->PortListMessage" msg
+        AddLogLine logLine ->
+            let
+                -- _ =
+                --     Debug.log "AddLogLine" logLine
+                prev_timestamp =
+                    dateToUnixtime model.last_timestamp
 
-                    ( newPortList, subCmd ) =
-                        PortList.update subMsg model.ports
-                in
-                    { model | ports = newPortList } ! [ Cmd.map PortListMessage subCmd ]
+                log_timestamp =
+                    dateToUnixtime logLine.timestamp
 
-            -- ( model, Cmd.none )
-            Tick newTime ->
-                ( { model | time = newTime }, Cmd.none )
+                delta =
+                    log_timestamp - prev_timestamp
 
-            EnableScroll scroll ->
-                let
-                    scroll_before =
-                        model.autoscroll
+                new_logs =
+                    Array.push
+                        { logLine
+                            | delta = delta
+                        }
+                        model.logs
+            in
+                case model.findIndex of
+                    0 ->
+                        { model
+                            | logs = new_logs
+                            , last_timestamp = logLine.timestamp
+                        }
+                            ! [ scrollToBottom model.autoscroll ]
 
-                    action =
-                        if scroll_before == False && scroll == True then
-                            Cmd.batch [ scrollToBottom True ]
-                        else
-                            Cmd.none
-                in
-                    ( { model | autoscroll = scroll }, action )
-
-            ChatScrolled event ->
-                { model
-                    | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
-                    , scrollEvent = event
-                }
-                    ! []
-
-            SaveLogToFile ->
-                let
-                    _ =
-                        Debug.log "save" 0
-                in
-                    model ! [ saveLogToFile model.logs ]
-
-            SaveLogDone _ ->
-                model ! []
-
-            EnterFindText text ->
-                { model | findText = Just text, findIndex = 0 } ! []
-
-            PressKeyOnFind key ->
-                if key == 13 then
-                    if model.findIndex == 0 then
+                    _ ->
                         let
+                            index =
+                                (Array.length new_logs) - 1
+
                             text =
                                 model.findText |> Maybe.withDefault ""
 
-                            f : LogLine -> ( Int, Array Int ) -> ( Int, Array Int )
-                            f =
-                                \d ( index, acc ) ->
-                                    if String.contains text d.data then
-                                        ( index + 1, Array.push index acc )
-                                    else
-                                        ( index + 1, acc )
-
-                            ( _, results ) =
-                                model.logs
-                                    |> Array.foldl f ( 0, Array.empty )
+                            findResults =
+                                if String.contains text logLine.data then
+                                    Array.push index model.findResults
+                                else
+                                    model.findResults
                         in
-                            if Array.length results > 0 then
-                                { model | findResults = results, findIndex = 0 } |> update NextFindResult
-                                -- let
-                                --     line =
-                                --         results
-                                --             |> Array.get 0
-                                --             |> Maybe.withDefault 0
-                                -- in
-                                --     { model | findResults = results, findIndex = 1 } ! [ scrollToLine line ]
-                            else
-                                { model | findResults = results, findIndex = 0 } ! []
-                    else if model.findIndex < Array.length model.findResults then
-                        model |> update NextFindResult
+                            { model
+                                | logs = new_logs
+                                , last_timestamp = logLine.timestamp
+                                , findResults = findResults
+                            }
+                                ! [ scrollToBottom model.autoscroll ]
+
+        ClearLog ->
+            { model
+                | logs = Array.empty
+                , labels = Array.empty
+                , active_label = 0
+                , last_labelid = 0
+                , findResults = Array.empty
+                , findIndex = 0
+                , hint = "Очищено"
+            }
+                ! [ scrollToBottom True ]
+
+        OnPortReceive ev_line ->
+            -- let
+            --     _ =
+            --         Debug.log "On port message" ev_line
+            -- in
+            model ! [ addPortMsg ev_line.id ev_line.data ]
+
+        OnPortReceiveError ev_line ->
+            -- let
+            --     _ =
+            --         Debug.log "On port error message" ev_line
+            -- in
+            model ! [ addPortMsg ev_line.id ev_line.data ]
+
+        PortListMessage subMsg ->
+            let
+                _ =
+                    Debug.log "Update->PortListMessage" msg
+
+                ( newPortList, subCmd ) =
+                    PortList.update subMsg model.ports
+            in
+                { model | ports = newPortList } ! [ Cmd.map PortListMessage subCmd ]
+
+        -- ( model, Cmd.none )
+        Tick newTime ->
+            ( { model | time = newTime }, Cmd.none )
+
+        EnableScroll scroll ->
+            let
+                scroll_before =
+                    model.autoscroll
+
+                action =
+                    if scroll_before == False && scroll == True then
+                        Cmd.batch [ scrollToBottom True ]
                     else
-                        model ! []
+                        Cmd.none
+            in
+                ( { model | autoscroll = scroll }, action )
+
+        ChatScrolled event ->
+            { model
+                | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
+                , scrollEvent = event
+            }
+                ! []
+
+        SaveLogToFile ->
+            let
+                _ =
+                    Debug.log "save" 0
+            in
+                model ! [ saveLogToFile model.logs ]
+
+        SaveLogDone _ ->
+            model ! []
+
+        EnterFindText text ->
+            { model | findText = Just text, findIndex = 0 } ! []
+
+        PressKeyOnFind key ->
+            if key == 13 then
+                if model.findIndex == 0 then
+                    let
+                        text =
+                            model.findText |> Maybe.withDefault ""
+
+                        f : LogLine -> ( Int, Array Int ) -> ( Int, Array Int )
+                        f =
+                            \d ( index, acc ) ->
+                                if String.contains text d.data then
+                                    ( index + 1, Array.push index acc )
+                                else
+                                    ( index + 1, acc )
+
+                        ( _, results ) =
+                            model.logs
+                                |> Array.foldl f ( 0, Array.empty )
+                    in
+                        if Array.length results > 0 then
+                            { model | findResults = results, findIndex = 0 } |> update NextFindResult
+                            -- let
+                            --     line =
+                            --         results
+                            --             |> Array.get 0
+                            --             |> Maybe.withDefault 0
+                            -- in
+                            --     { model | findResults = results, findIndex = 1 } ! [ scrollToLine line ]
+                        else
+                            { model | findResults = results, findIndex = 0 } ! []
+                else if model.findIndex < Array.length model.findResults then
+                    model |> update NextFindResult
                 else
-                    { model | findResults = Array.empty, findIndex = 0 } ! []
+                    model ! []
+            else
+                { model | findResults = Array.empty, findIndex = 0 } ! []
 
-            NextFindResult ->
-                let
-                    index =
-                        model.findIndex + 1
+        NextFindResult ->
+            let
+                index =
+                    model.findIndex + 1
 
-                    line =
-                        case Array.get (index - 1) model.findResults of
-                            Just value ->
-                                value
+                line =
+                    case Array.get (index - 1) model.findResults of
+                        Just value ->
+                            value
 
-                            _ ->
-                                0
-                in
-                    { model | findIndex = index } ! [ scrollToLine line ]
+                        _ ->
+                            0
+            in
+                { model | findIndex = index } ! [ scrollToLine line ]
 
-            PrevFindResult ->
-                let
-                    index =
-                        model.findIndex - 1
+        PrevFindResult ->
+            let
+                index =
+                    model.findIndex - 1
 
-                    line =
-                        case Array.get (index - 1) model.findResults of
-                            Just value ->
-                                value
+                line =
+                    case Array.get (index - 1) model.findResults of
+                        Just value ->
+                            value
 
-                            _ ->
-                                0
-                in
-                    { model | findIndex = index } ! [ scrollToLine line ]
+                        _ ->
+                            0
+            in
+                { model | findIndex = index } ! [ scrollToLine line ]
 
-            NoOp ->
-                model ! []
+        NoOp ->
+            model ! []
 
 
 saveLogToFile : Array LogLine -> Cmd Msg
