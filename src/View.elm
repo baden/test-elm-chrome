@@ -178,7 +178,7 @@ stylesheet m =
 
         rules =
             m.ports.ports
-                |> List.map (\p -> rule p)
+                |> List.map (\( _, p ) -> rule p)
                 |> String.concat
     in
         node tag

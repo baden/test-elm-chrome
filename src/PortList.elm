@@ -8,10 +8,19 @@ import Html.Events exposing (onClick)
 import Port
 
 
+type alias ID =
+    Int
+
+
 type alias Model =
-    { uid : Int
-    , ports : List Port.Model
+    { uid : ID
+    , ports : List ( ID, Port.Model )
     }
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( defaultModel, Cmd.none )
 
 
 defaultModel : Model
@@ -22,61 +31,67 @@ defaultModel =
 
 
 type Msg
-    = PortMessage Int Port.Msg
+    = NoOp
     | AddPort
-
-
-
--- | RemovePort Int
+    | PortMessage ID Port.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        _ =
-            Debug.log "PortList:Update" ( msg, model )
-    in
-        case msg of
-            PortMessage id (Port.RemovePort _) ->
-                { model | ports = List.filter (\t -> t.id /= id) model.ports }
-                    ! []
+    case msg of
+        NoOp ->
+            model ! []
 
-            PortMessage id subMsg ->
-                let
-                    f : Port.Model -> ( List Port.Model, List (Cmd Msg) ) -> ( List Port.Model, List (Cmd Msg) )
-                    f =
-                        \p ( ports, cmds ) ->
-                            if p.id == id then
-                                let
-                                    ( newPort, subCmd ) =
-                                        Port.update subMsg p
-                                in
-                                    ( newPort :: ports, [] )
-                            else
-                                ( p :: ports, [] )
+        AddPort ->
+            let
+                id =
+                    model.uid
 
-                    ( newPorts, cmds ) =
-                        model.ports
-                            |> List.foldr f ( [], [] )
+                ( port_, subCmd ) =
+                    Port.init id
+            in
+                -- TODO: Возможно стоит сделать обратный порядок?
+                { model
+                    | uid = model.uid + 1
+                    , ports = model.ports ++ [ ( id, port_ ) ]
+                }
+                    ! [ Cmd.map (PortMessage id) subCmd ]
 
-                    _ =
-                        Debug.log "  ****=>  PortList.update:PortMessage" ( id, subMsg )
-                in
-                    { model | ports = newPorts } ! []
+        -- PortMessage id (Port.RemovePort _) ->
+        --     { model | ports = List.filter (\t -> t.id /= id) model.ports }
+        --         ! []
+        PortMessage id subMsg ->
+            let
+                f : ( ID, Port.Model ) -> ( List ( ID, Port.Model ), List (Cmd Msg) ) -> ( List ( ID, Port.Model ), List (Cmd Msg) )
+                f =
+                    \( portId, portModel ) ( ports, cmds ) ->
+                        if portId == id then
+                            let
+                                ( newPort, subCmd, parentCmd ) =
+                                    Port.update subMsg portModel
 
-            AddPort ->
-                let
-                    id =
-                        model.uid
+                                _ =
+                                    Debug.log "==**== parentCmd" parentCmd
+                            in
+                                case parentCmd of
+                                    Nothing ->
+                                        ( ( portId, newPort ) :: ports, Cmd.map (PortMessage id) subCmd :: cmds )
 
-                    ( port_, subCmd ) =
-                        Port.init id
-                in
-                    { model
-                        | uid = model.uid + 1
-                        , ports = model.ports ++ [ port_ ]
-                    }
-                        ! [ Cmd.map (PortMessage id) subCmd ]
+                                    Just (Port.Remove) ->
+                                        ( ports, cmds )
+                        else
+                            ( ( portId, portModel ) :: ports, [] )
+
+                ( newPorts, cmds ) =
+                    model.ports
+                        |> List.foldr f ( [], [] )
+
+                _ =
+                    Debug.log "  ****=>  PortList.update:PortMessage" ( id, subMsg )
+            in
+                -- { model | ports = newPorts } ! [ Cmd.map (PortMessage id) cmds ]
+                -- TODO: TBD
+                { model | ports = newPorts } ! []
 
 
 
@@ -91,9 +106,9 @@ view : Model -> Html Msg
 view model =
     model.ports
         |> List.map
-            (\c ->
-                Port.view c
-                    |> Html.map (PortMessage c.id)
+            (\( id, portModel ) ->
+                Port.view portModel
+                    |> Html.map (PortMessage id)
             )
         |> div [ class "port_list" ]
 

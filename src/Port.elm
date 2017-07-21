@@ -1,7 +1,7 @@
-module Port exposing (Msg(..), Model, init, view, update)
+module Port exposing (Msg, Model, ParentMgs(Remove), init, view, update)
 
 import Html exposing (Html, div, button, option, text, select, input)
-import Html.Attributes exposing (class, value, title, disabled, type_, placeholder)
+import Html.Attributes exposing (class, value, title, disabled, type_, placeholder, selected)
 import Html.Events exposing (onClick, onInput)
 import Array exposing (Array)
 import Task exposing (Task)
@@ -33,7 +33,11 @@ type Msg
     | PortConnected ( String, Int )
     | PortDisconnected ( Int, Bool )
     | SetSerialDevices (List Serial.Port)
-    | RemovePort Int
+    | RemovePort
+
+
+type ParentMgs
+    = Remove
 
 
 
@@ -60,7 +64,7 @@ defaultModel id =
     }
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg, Maybe ParentMgs )
 update msg model =
     let
         _ =
@@ -68,43 +72,61 @@ update msg model =
     in
         case msg of
             OnChangePortPath value ->
-                { model | path = value } ! []
+                ( { model | path = value }
+                , Cmd.none
+                , Nothing
+                )
 
             OnChangePortBoudrate value ->
-                { model | boudrate = value } ! []
+                ( { model | boudrate = value }
+                , Cmd.none
+                , Nothing
+                )
 
             OnChangeColorEvent value ->
-                { model | logColor = value } ! []
+                ( { model | logColor = value }
+                , Cmd.none
+                , Nothing
+                )
 
             ConnectPort ->
                 let
                     _ =
                         Debug.log "Connect" model
                 in
-                    model
-                        ! [ Serial.connect
-                                ( model.path
-                                , String.toInt model.boudrate |> Result.withDefault 19200
-                                )
-                                PortConnected
-                          ]
+                    ( model
+                    , Cmd.batch
+                        [ Serial.connect
+                            ( model.path
+                            , String.toInt model.boudrate |> Result.withDefault 19200
+                            )
+                            PortConnected
+                        ]
+                    , Nothing
+                    )
 
             DisconnectPort ->
                 let
                     _ =
                         Debug.log "Disconnect" model
                 in
-                    model ! [ Serial.disconnect model.cid PortDisconnected ]
+                    ( model
+                    , Cmd.batch [ Serial.disconnect model.cid PortDisconnected ]
+                    , Nothing
+                    )
 
             PortConnected ( path, cid ) ->
                 -- { model | ports = patchPort model.ports .path path (\p -> { p | connected = True, cid = cid }) } ! []
-                { model | connected = True, cid = cid } ! []
+                ( { model | connected = True, cid = cid }
+                , Cmd.none
+                , Nothing
+                )
 
             PortDisconnected ( cid, result ) ->
-                -- { model
-                --     | ports = patchPort model.ports .cid cid (\p -> { p | connected = False, cid = 0 })
-                -- }
-                { model | connected = False, cid = 0 } ! []
+                ( { model | connected = False, cid = 0 }
+                , Cmd.none
+                , Nothing
+                )
 
             SetSerialDevices ports ->
                 let
@@ -117,23 +139,32 @@ update msg model =
                     _ =
                         Debug.log "  ports" ports
                 in
-                    ( { model | portList = ports }, Cmd.none )
+                    ( { model | portList = ports }
+                    , Cmd.none
+                    , Nothing
+                    )
 
             -- TODO: Dirty hack
-            RemovePort id ->
-                model ! []
+            RemovePort ->
+                ( model
+                , Cmd.none
+                , Just Remove
+                )
 
 
-toSelectOption : String -> Html a
-toSelectOption x =
-    option [ value x ] [ text x ]
+toSelectOption : String -> String -> Html a
+toSelectOption active x =
+    if active == x then
+        option [ value x, selected True ] [ text x ]
+    else
+        option [ value x ] [ text x ]
 
 
-listToHtmlSelectOptions : List String -> List (Html a)
-listToHtmlSelectOptions list =
+listToHtmlSelectOptions : List String -> String -> List (Html a)
+listToHtmlSelectOptions list active =
     option [ value "" ] [ text "Скорость" ]
         :: (list
-                |> List.map toSelectOption
+                |> List.map (toSelectOption active)
            )
 
 
@@ -147,15 +178,22 @@ portLabel path name =
             path ++ " : " ++ name
 
 
-portOption : Serial.Port -> Html a
-portOption p =
-    option [ value p.path ]
-        [ text (portLabel p.path p.displayName) ]
+portOption : String -> Serial.Port -> Html a
+portOption active p =
+    let
+        options =
+            if p.path == active then
+                [ value p.path, selected True ]
+            else
+                [ value p.path ]
+    in
+        option options
+            [ text (portLabel p.path p.displayName) ]
 
 
-listPorts : List Serial.Port -> List (Html a)
-listPorts list =
-    (option [ value "" ] [ text "Порт" ]) :: (list |> List.map portOption)
+listPorts : List Serial.Port -> String -> List (Html a)
+listPorts list selected =
+    (option [ value "" ] [ text "Порт" ]) :: (list |> List.map (portOption selected))
 
 
 fakeSpeedList : List String
@@ -195,12 +233,12 @@ view model =
             [ select
                 [ onInput <| OnChangePortPath
                 ]
-                (listPorts model.portList)
+                (listPorts model.portList model.path)
             , select
                 [ disabled (model.path == "")
                 , onInput <| OnChangePortBoudrate
                 ]
-                (listToHtmlSelectOptions fakeSpeedList)
+                (listToHtmlSelectOptions fakeSpeedList model.boudrate)
             , gr
                 [ button
                     [ title "Подключить порт и начать запись лога"
@@ -252,11 +290,11 @@ view model =
                 [ title "Удалить"
                 , disabled (model.connected)
                   -- TODO: restore
-                , onClick (RemovePort model.id)
+                , onClick RemovePort
                 ]
                 [ text "🚮" ]
               -- 🞩
-              -- , text (toString port_)
+              -- , text (toString model)
               -- , text " / "
               --   , text (toString (Serial.loadTime))
               --   , text " / "
