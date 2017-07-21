@@ -1,7 +1,6 @@
 module Types
     exposing
-        ( Port
-        , Model
+        ( Model
         , initModel
         , Msg(..)
           -- , initPort
@@ -12,11 +11,11 @@ module Types
         , LabelType(..)
         )
 
-import Serial
 import Date
 import Array exposing (Array)
 import Time
 import Serial.LowLevel as SLL
+import Port
 
 
 -- import Time exposing (Time)
@@ -26,10 +25,7 @@ import Serial.LowLevel as SLL
 
 type alias Model =
     { uid : Int
-    , portList :
-        List Serial.Port
-        -- TODO: Заменить на Dict id Port
-    , ports : List Port
+    , ports : List Port.Model
     , time : Time.Time
     , debug : String
     , logs : Array LogLine
@@ -50,7 +46,6 @@ type alias Model =
 initModel : Model
 initModel =
     { uid = 0
-    , portList = []
     , ports = []
     , time = 0
     , debug = ""
@@ -69,31 +64,13 @@ initModel =
     }
 
 
-type alias Port =
-    { id : Int
-    , path : String
-    , boudrate : String
-    , name : String
-    , cid : Int
-    , logColor : String
-    , connected : Bool
-    }
-
-
 type Msg
     = AddPort
+    | PortMessage Port.Msg
     | RemovePort Int
-    | ConnectPort Port
-    | DisconnectPort Port
-    | PortConnected ( String, Int )
-    | PortDisconnected ( Int, Bool )
-    | OnChangePortPath Int String
-    | OnChangePortBoudrate Int String
-    | OnChangeColorEvent Int String
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event
     | Tick Time.Time
-    | SetSerialDevices (List Serial.Port)
     | AddLabel LabelType
     | ToNextLabel
     | ToPrevLabel

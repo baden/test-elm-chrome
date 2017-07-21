@@ -11,9 +11,9 @@ import Task exposing (Task)
 import Serial
 import Types
     exposing
-        ( Port
+        ( -- Port
           -- , initPort
-        , initModel
+          initModel
         , Model
         , Msg(..)
         , OnScrollEvent
@@ -21,6 +21,7 @@ import Types
         , Sender(..)
         , LabelType(..)
         )
+import Port
 import Dom.Scroll
 import Json.Decode
 import Html
@@ -41,7 +42,8 @@ import Helpers
 
 init : ( Model, Cmd Msg )
 init =
-    ( initModel, Cmd.batch [ getSerialDevices ] )
+    -- ( initModel, Cmd.batch [ getSerialDevices ] )
+    ( initModel, Cmd.none )
 
 
 scrollToBottom : Bool -> Cmd Msg
@@ -128,14 +130,14 @@ update msg model =
                 id =
                     model.uid
 
-                port_ =
-                    Types.Port id "" "" " " 0 (getColor id) False
+                ( port_, subCmd ) =
+                    Port.init id
             in
                 { model
                     | uid = model.uid + 1
                     , ports = model.ports ++ [ port_ ]
                 }
-                    ! []
+                    ! [ Cmd.map PortMessage subCmd ]
 
         AddLabel labelType ->
             let
@@ -246,50 +248,6 @@ update msg model =
             }
                 ! [ scrollToBottom True ]
 
-        ConnectPort port_ ->
-            let
-                _ =
-                    Debug.log "Connect" port_
-            in
-                model
-                    ! [ Serial.connect
-                            ( port_.path
-                            , String.toInt port_.boudrate |> Result.withDefault 19200
-                            )
-                            PortConnected
-                      ]
-
-        DisconnectPort port_ ->
-            let
-                _ =
-                    Debug.log "Disconnect" port_
-            in
-                model ! [ Serial.disconnect port_.cid PortDisconnected ]
-
-        PortConnected ( path, cid ) ->
-            { model | ports = patchPort model.ports .path path (\p -> { p | connected = True, cid = cid }) } ! []
-
-        PortDisconnected ( cid, result ) ->
-            { model
-                | ports = patchPort model.ports .cid cid (\p -> { p | connected = False, cid = 0 })
-            }
-                ! []
-
-        OnChangeColorEvent cid value ->
-            { model
-                | ports = patchPort model.ports .cid cid (\p -> { p | logColor = value })
-            }
-                ! []
-
-        OnChangePortPath port_id value ->
-            { model
-                | ports = patchPort model.ports .id port_id (\p -> { p | path = value })
-            }
-                ! []
-
-        OnChangePortBoudrate port_id value ->
-            { model | ports = patchPort model.ports .id port_id (\p -> { p | boudrate = value }) } ! []
-
         OnPortReceive ev_line ->
             -- let
             --     _ =
@@ -308,6 +266,17 @@ update msg model =
             { model | ports = List.filter (\t -> t.id /= id) model.ports }
                 ! []
 
+        PortMessage msg ->
+            let
+                _ =
+                    Debug.log "Boo"
+
+                -- ( updatePort, subCmd ) =
+                --     Port.update msg model.ports
+            in
+                -- {model | port = updatePort} ! [ Cmd.map PortMessage subCmd ]
+                ( model, Cmd.none )
+
         Tick newTime ->
             ( { model | time = newTime }, Cmd.none )
 
@@ -323,13 +292,6 @@ update msg model =
                         Cmd.none
             in
                 ( { model | autoscroll = scroll }, action )
-
-        SetSerialDevices ports ->
-            let
-                _ =
-                    Debug.log "SetSerialDevices" ports
-            in
-                ( { model | portList = ports }, Cmd.none )
 
         ChatScrolled event ->
             { model
@@ -422,18 +384,6 @@ update msg model =
             model ! []
 
 
-patchPort : List a -> (a -> b) -> b -> (a -> a) -> List a
-patchPort ports cond value fun =
-    ports
-        |> List.map
-            (\p ->
-                if (cond p) == value then
-                    fun p
-                else
-                    p
-            )
-
-
 saveLogToFile : Array LogLine -> Cmd Msg
 saveLogToFile logs =
     let
@@ -469,30 +419,6 @@ saveLogToFile logs =
 dateToUnixtime : Date.Date -> Float
 dateToUnixtime date =
     (Date.toTime date) / 1000
-
-
-getSerialDevices : Cmd Msg
-getSerialDevices =
-    -- Time.now
-    Serial.getDevices
-        |> Task.perform
-            SetSerialDevices
-
-
-getColor : Int -> String
-getColor i =
-    Array.get (i % Array.length portColors) portColors
-        |> Maybe.withDefault "black"
-
-
-portColors : Array String
-portColors =
-    Array.fromList
-        [ "#9F0000"
-        , "#00009F"
-        , "#9F009F"
-        , "#9F9F00"
-        ]
 
 
 onClickAddLabel : LabelType -> Int -> Cmd Msg

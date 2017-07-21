@@ -4,7 +4,7 @@ import Html exposing (Html, div, pre, p, text, span, a, mark)
 import Html.Attributes exposing (class, id, style)
 import Array exposing (Array)
 import Update exposing (onScroll)
-import Types exposing (Msg(..), Model, LogLine, Port, Sender(..))
+import Types exposing (Msg(..), Model, LogLine, Sender(..))
 import Helpers
 
 

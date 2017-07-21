@@ -9,6 +9,7 @@
             "width": 980,
             "height": 600
         },
+        "toolbar": true,
         "min_width": 512,
         "min_height": 256,
         "icon": "images/search-128.png"

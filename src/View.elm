@@ -5,12 +5,11 @@ import Html.Attributes exposing (class, title, type_, placeholder, disabled)
 import Html.Events exposing (onClick, onInput)
 import Types
     exposing
-        ( Port
-        , Model
+        ( Model
         , Msg(..)
         , LabelType(..)
         )
-import Port.View
+import Port
 import Log.View
 import Array exposing (Array)
 import Json.Decode
@@ -117,7 +116,7 @@ view model =
             [ -- div [ class "header" ] [ text "Логер 3" ]
               div [ class "toolbox" ]
                 [ control_view model
-                , Port.View.ports_view model model.ports
+                , ports_view model model.ports
                 ]
             , Log.View.log_view model
             , statusbar_view model
@@ -126,6 +125,13 @@ view model =
         , debug_view model
         , stylesheet model
         ]
+
+
+ports_view : Model -> List Port.Model -> Html Msg
+ports_view model ports =
+    ports
+        |> List.map (\c -> Html.map PortMessage (Port.view c))
+        |> div [ class "port_list" ]
 
 
 statusbar_view : Model -> Html Msg
