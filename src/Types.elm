@@ -15,7 +15,7 @@ import Date
 import Array exposing (Array)
 import Time
 import Serial.LowLevel as SLL
-import Port
+import PortList
 
 
 -- import Time exposing (Time)
@@ -25,7 +25,7 @@ import Port
 
 type alias Model =
     { uid : Int
-    , ports : List Port.Model
+    , ports : PortList.Model
     , time : Time.Time
     , debug : String
     , logs : Array LogLine
@@ -46,7 +46,7 @@ type alias Model =
 initModel : Model
 initModel =
     { uid = 0
-    , ports = []
+    , ports = PortList.defaultModel
     , time = 0
     , debug = ""
     , logs = Array.empty
@@ -65,9 +65,8 @@ initModel =
 
 
 type Msg
-    = AddPort
-    | PortMessage Port.Msg
-    | RemovePort Int
+    = PortListMessage PortList.Msg
+      -- | AddPort
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event
     | Tick Time.Time

@@ -9,7 +9,7 @@ import Types
         , Msg(..)
         , LabelType(..)
         )
-import Port
+import PortList
 import Log.View
 import Array exposing (Array)
 import Json.Decode
@@ -26,7 +26,11 @@ gr =
 control_view : Model -> Html Msg
 control_view model =
     div [ class "control" ]
-        [ button [ onClick AddPort ] [ text "➕ Добавить порт" ]
+        -- [ button [ onClick AddPort ] [ text "➕ Добавить порт" ]
+        -- TODO: восстановить в первую очередь
+        -- [ button [] [ text "➕ Добавить порт" ]
+        [ Html.map PortListMessage (PortList.add_button_view model.ports)
+          -- [ button [ onClick PortList.AddPort ] [ text "➕ Добавить порт" ]
         , gr
             [ button [ title "Поставить метку", onClick (AddLabel LabelRegular) ] [ text "✅" ]
             , button [ title "Пометить как хорошее", class "good", onClick (AddLabel LabelGood) ] [ text "🙂" ]
@@ -116,7 +120,7 @@ view model =
             [ -- div [ class "header" ] [ text "Логер 3" ]
               div [ class "toolbox" ]
                 [ control_view model
-                , ports_view model model.ports
+                , Html.map PortListMessage (PortList.view model.ports)
                 ]
             , Log.View.log_view model
             , statusbar_view model
@@ -125,13 +129,6 @@ view model =
         , debug_view model
         , stylesheet model
         ]
-
-
-ports_view : Model -> List Port.Model -> Html Msg
-ports_view model ports =
-    ports
-        |> List.map (\c -> Html.map PortMessage (Port.view c))
-        |> div [ class "port_list" ]
 
 
 statusbar_view : Model -> Html Msg
@@ -180,7 +177,7 @@ stylesheet m =
                 ++ ";}\n"
 
         rules =
-            m.ports
+            m.ports.ports
                 |> List.map (\p -> rule p)
                 |> String.concat
     in
