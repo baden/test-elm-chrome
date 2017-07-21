@@ -254,9 +254,6 @@ update msg model =
 
         PortListMessage subMsg ->
             let
-                _ =
-                    Debug.log "Update->PortListMessage" msg
-
                 ( newPortList, subCmd ) =
                     PortList.update subMsg model.ports
             in

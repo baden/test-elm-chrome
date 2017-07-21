@@ -70,8 +70,11 @@ update msg model =
                                 ( newPort, subCmd, parentCmd ) =
                                     Port.update subMsg portModel
 
-                                _ =
-                                    Debug.log "==**== parentCmd" parentCmd
+                                -- _ =
+                                --     Debug.log "==**== parentCmd" parentCmd
+                                --
+                                -- _ =
+                                --     Debug.log "  ==**== subCmd" subCmd
                             in
                                 case parentCmd of
                                     Nothing ->
@@ -80,18 +83,18 @@ update msg model =
                                     Just (Port.Remove) ->
                                         ( ports, cmds )
                         else
-                            ( ( portId, portModel ) :: ports, [] )
+                            ( ( portId, portModel ) :: ports, cmds )
 
                 ( newPorts, cmds ) =
                     model.ports
                         |> List.foldr f ( [], [] )
 
-                _ =
-                    Debug.log "  ****=>  PortList.update:PortMessage" ( id, subMsg )
+                -- _ =
+                --     Debug.log "  ****=>  PortList.update:PortMessage" ( id, subMsg, cmds )
             in
                 -- { model | ports = newPorts } ! [ Cmd.map (PortMessage id) cmds ]
                 -- TODO: TBD
-                { model | ports = newPorts } ! []
+                { model | ports = newPorts } ! cmds
 
 
 

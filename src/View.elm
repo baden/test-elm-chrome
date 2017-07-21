@@ -126,7 +126,7 @@ view model =
             , statusbar_view model
             ]
           -- , hint_view model.hint
-        , debug_view model
+          -- , debug_view model
         , stylesheet model
         ]
 

@@ -66,90 +66,71 @@ defaultModel id =
 
 update : Msg -> Model -> ( Model, Cmd Msg, Maybe ParentMgs )
 update msg model =
-    let
-        _ =
-            Debug.log "Port.update" ( msg, model )
-    in
-        case msg of
-            OnChangePortPath value ->
-                ( { model | path = value }
-                , Cmd.none
-                , Nothing
-                )
+    -- let
+    --     _ =
+    --         Debug.log "Port.update" ( msg, model )
+    -- in
+    case msg of
+        OnChangePortPath value ->
+            ( { model | path = value }
+            , Cmd.none
+            , Nothing
+            )
 
-            OnChangePortBoudrate value ->
-                ( { model | boudrate = value }
-                , Cmd.none
-                , Nothing
-                )
+        OnChangePortBoudrate value ->
+            ( { model | boudrate = value }
+            , Cmd.none
+            , Nothing
+            )
 
-            OnChangeColorEvent value ->
-                ( { model | logColor = value }
-                , Cmd.none
-                , Nothing
-                )
+        OnChangeColorEvent value ->
+            ( { model | logColor = value }
+            , Cmd.none
+            , Nothing
+            )
 
-            ConnectPort ->
-                let
-                    _ =
-                        Debug.log "Connect" model
-                in
-                    ( model
-                    , Cmd.batch
-                        [ Serial.connect
-                            ( model.path
-                            , String.toInt model.boudrate |> Result.withDefault 19200
-                            )
-                            PortConnected
-                        ]
-                    , Nothing
+        ConnectPort ->
+            ( model
+            , Cmd.batch
+                [ Serial.connect
+                    ( model.path
+                    , String.toInt model.boudrate |> Result.withDefault 19200
                     )
+                    PortConnected
+                ]
+            , Nothing
+            )
 
-            DisconnectPort ->
-                let
-                    _ =
-                        Debug.log "Disconnect" model
-                in
-                    ( model
-                    , Cmd.batch [ Serial.disconnect model.cid PortDisconnected ]
-                    , Nothing
-                    )
+        DisconnectPort ->
+            ( model
+            , Cmd.batch [ Serial.disconnect model.cid PortDisconnected ]
+            , Nothing
+            )
 
-            PortConnected ( path, cid ) ->
-                -- { model | ports = patchPort model.ports .path path (\p -> { p | connected = True, cid = cid }) } ! []
-                ( { model | connected = True, cid = cid }
-                , Cmd.none
-                , Nothing
-                )
+        PortConnected ( path, cid ) ->
+            ( { model | connected = True, cid = cid }
+            , Cmd.none
+            , Nothing
+            )
 
-            PortDisconnected ( cid, result ) ->
-                ( { model | connected = False, cid = 0 }
-                , Cmd.none
-                , Nothing
-                )
+        PortDisconnected ( cid, result ) ->
+            ( { model | connected = False, cid = 0 }
+            , Cmd.none
+            , Nothing
+            )
 
-            SetSerialDevices ports ->
-                let
-                    _ =
-                        Debug.log "########### = SetSerialDevices" ports
+        SetSerialDevices ports ->
+            ( { model | portList = ports }
+            , Cmd.none
+            , Nothing
+            )
 
-                    _ =
-                        Debug.log "  model" model
-
-                    _ =
-                        Debug.log "  ports" ports
-                in
-                    ( { model | portList = ports }
-                    , Cmd.none
-                    , Nothing
-                    )
-
-            -- TODO: Dirty hack
-            RemovePort ->
-                ( model
-                , Cmd.none
-                , Just Remove
-                )
+        -- TODO: Dirty hack
+        RemovePort ->
+            ( model
+            , Cmd.none
+            , Just Remove
+            )
 
 
 toSelectOption : String -> String -> Html a
@@ -225,83 +206,80 @@ gr =
 
 view : Model -> Html Msg
 view model =
-    let
-        _ =
-            Debug.log "Port.view " model
-    in
-        div [ class "port" ]
-            [ select
-                [ onInput <| OnChangePortPath
-                ]
-                (listPorts model.portList model.path)
-            , select
-                [ disabled (model.path == "")
-                , onInput <| OnChangePortBoudrate
-                ]
-                (listToHtmlSelectOptions fakeSpeedList model.boudrate)
-            , gr
-                [ button
-                    [ title "Подключить порт и начать запись лога"
-                    , class
-                        ("record"
-                            ++ (if not model.connected then
-                                    ""
-                                else
-                                    " active"
-                               )
-                        )
-                    , disabled ((model.path == "") || (model.boudrate == ""))
-                    , onClick ConnectPort
-                    ]
-                    [ text "⏺" ]
-                , button
-                    [ title "Остановить запись лога и отключить порт"
-                    , disabled (model.path == "")
-                    , class
-                        (if model.connected then
-                            ""
-                         else
-                            "active"
-                        )
-                      -- TODO: restore
-                      -- , onClick (DisconnectPort port_)
-                    ]
-                    [ text "⏹" ]
-                ]
-            , button
-                [ class "colorpicker"
-                , title "Цвет текста лога"
-                  -- , disabled (model.path == "")
-                ]
-                [ text "W"
-                , input
-                    [ type_ "color"
-                    , value model.logColor
-                    , disabled (model.path == "")
-                    , onInput <| OnChangeColorEvent
-                    ]
-                    []
-                ]
-            , div [ class "label", title "Используется как подпись строк при сохранении в файл" ]
-                [ text "L"
-                , input [ type_ "input", placeholder "Метка" ] []
-                ]
-            , button
-                [ title "Удалить"
-                , disabled (model.connected)
-                  -- TODO: restore
-                , onClick RemovePort
-                ]
-                [ text "🚮" ]
-              -- 🞩
-              -- , text (toString model)
-              -- , text " / "
-              --   , text (toString (Serial.loadTime))
-              --   , text " / "
-              -- , text (toString (port_.id))
-              -- , text " / "
-              -- , text (toString (getColor port_.id))
+    div [ class "port" ]
+        [ select
+            [ disabled (model.connected)
+            , onInput <| OnChangePortPath
             ]
+            (listPorts model.portList model.path)
+        , select
+            [ disabled ((model.path == "") || (model.connected))
+            , onInput <| OnChangePortBoudrate
+            ]
+            (listToHtmlSelectOptions fakeSpeedList model.boudrate)
+        , gr
+            [ button
+                [ title "Подключить порт и начать запись лога"
+                , class
+                    ("record"
+                        ++ (if not model.connected then
+                                ""
+                            else
+                                " active"
+                           )
+                    )
+                , disabled ((model.path == "") || (model.boudrate == "") || (model.connected))
+                , onClick ConnectPort
+                ]
+                [ text "⏺" ]
+            , button
+                [ title "Остановить запись лога и отключить порт"
+                , disabled ((model.path == "") || (not model.connected))
+                , class
+                    (if model.connected then
+                        ""
+                     else
+                        "active"
+                    )
+                  -- TODO: restore
+                , onClick DisconnectPort
+                ]
+                [ text "⏹" ]
+            ]
+        , button
+            [ class "colorpicker"
+            , title "Цвет текста лога"
+            , disabled (model.path == "")
+            ]
+            [ text "W"
+            , input
+                [ type_ "color"
+                , value model.logColor
+                , disabled (model.path == "")
+                , onInput <| OnChangeColorEvent
+                ]
+                []
+            ]
+        , div [ class "label", title "Используется как подпись строк при сохранении в файл" ]
+            [ text "L"
+            , input [ type_ "input", placeholder "Метка" ] []
+            ]
+        , button
+            [ title "Удалить"
+            , disabled (model.connected)
+              -- TODO: restore
+            , onClick RemovePort
+            ]
+            [ text "🚮" ]
+          -- 🞩
+          -- , text (toString model)
+          -- , text " / "
+          --   , text (toString (Serial.loadTime))
+          --   , text " / "
+          -- , text (toString (port_.id))
+          -- , text " / "
+          -- , text (toString (getColor port_.id))
+        ]
 
 
 getColor : Int -> String
