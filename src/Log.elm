@@ -7,17 +7,7 @@ module Log
         , update
         , addPortMsg
         , view
-        , view_addLabel
-        , view_markAsGood
-        , view_markAsBad
-        , view_toPrevLabel
-        , view_toNextLabel
-        , view_startTimer
-        , view_stopAutoScroll
-        , view_startAutoScroll
-        , view_clearLog
-        , view_find
-        , view_save
+        , view_control_panel
         , statusbar_view
         )
 
@@ -704,6 +694,39 @@ view_save model =
     button
         [ title "Сохранить в файл", onClick SaveLogToFile ]
         [ text "💾" ]
+
+
+gr : List (Html msg) -> Html msg
+gr =
+    div [ class "button-group" ]
+
+
+view_control_panel : Model -> Html Msg
+view_control_panel model =
+    div [ class "log-control-panel" ]
+        [ gr
+            [ view_addLabel model
+            , view_markAsGood model
+            , view_markAsBad model
+            ]
+        , gr
+            [ view_toPrevLabel model
+            , view_toNextLabel model
+            ]
+        , view_startTimer model
+        , gr
+            [ view_stopAutoScroll model
+            , view_startAutoScroll model
+            ]
+        , view_clearLog model
+        , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
+        , button [ title "Запись лога в облако" ] [ text "🌍" ]
+        , view_find model
+        , button [ title "Заметка" ] [ text "ℹ️" ]
+        , view_save model
+          -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
+        , button [ title "Настройки" ] [ text "🛠" ]
+        ]
 
 
 statusbar_view : Model -> Html Msg
