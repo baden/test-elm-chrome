@@ -3,19 +3,15 @@ module Types
         ( Model
         , initModel
         , Msg(..)
-          -- , initPort
-        , OnScrollEvent
-          -- , fakeLog
-        , LogLine
-        , Sender(..)
-        , LabelType(..)
         )
 
-import Date
-import Array exposing (Array)
+-- import Date
+-- import Array exposing (Array)
+
 import Time
 import Serial.LowLevel as SLL
 import PortList
+import Log
 
 
 -- import Time exposing (Time)
@@ -26,20 +22,11 @@ import PortList
 type alias Model =
     { uid : Int
     , ports : PortList.Model
+    , log : Log.Model
     , time : Time.Time
-    , debug : String
-    , logs : Array LogLine
-    , labels : Array Int
-    , active_label : Int
-    , last_timestamp : Date.Date
-    , last_labelid : Int
-    , shouldScroll : Bool
-    , autoscroll : Bool
-    , scrollEvent : OnScrollEvent
-    , hint : String
-    , findText : Maybe String
-    , findIndex : Int
-    , findResults : Array Int
+    , debug :
+        String
+        -- , hint : String
     }
 
 
@@ -47,78 +34,22 @@ initModel : Model
 initModel =
     { uid = 0
     , ports = PortList.defaultModel
+    , log = Log.initModel
     , time = 0
-    , debug = ""
-    , logs = Array.empty
-    , labels = Array.empty
-    , active_label = 0
-    , last_timestamp = Date.fromTime 0
-    , last_labelid = 0
-    , shouldScroll = False
-    , autoscroll = True
-    , scrollEvent = OnScrollEvent 0 0 0
-    , hint = "Бульк"
-    , findText = Nothing
-    , findIndex = 0
-    , findResults = Array.empty
+    , debug =
+        ""
+        -- , hint = "Бульк"
     }
 
 
 type Msg
     = PortListMessage PortList.Msg
       -- | AddPort
+    | LogMessage Log.Msg
     | OnPortReceive SLL.Event
     | OnPortReceiveError SLL.Event
     | Tick Time.Time
-    | AddLabel LabelType
-    | ToNextLabel
-    | ToPrevLabel
-    | AddLogLine LogLine
-    | ClearLog
-    | EnableScroll Bool
     | NoOp
-    | SaveLogToFile
-    | SaveLogDone String
-    | ChatScrolled OnScrollEvent
-    | EnterFindText String
-    | PressKeyOnFind Int
-    | NextFindResult
-    | PrevFindResult
-
-
-type alias OnScrollEvent =
-    { height : Float
-    , top : Float
-    , clientHeight : Float
-    }
-
-
-type Sender
-    = PortId Int
-    | LabelId Int
-
-
-type alias LogLine =
-    { data : String
-    , timestamp : Date.Date
-    , delta : Float
-    , sender : Sender
-    }
-
-
-type LabelType
-    = LabelRegular
-    | LabelGood
-    | LabelBad
-
-
-fakeLog : Int -> Date.Date -> String -> LogLine
-fakeLog id timestamp data =
-    LogLine
-        data
-        timestamp
-        0
-        (PortId id)
 
 
 
