@@ -17,6 +17,12 @@ body {
     line-height: 1.42857143;
 }
 
+.material-icons {
+    vertical-align: bottom;
+}
+
+
+
 .workspace {
     width: 100%;
     height: 100%;

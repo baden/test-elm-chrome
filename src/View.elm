@@ -59,7 +59,8 @@ view model =
             ]
           -- , hint_view model.hint
           -- , debug_view model
-        , stylesheet model
+        , PortList.stylesheet model.ports
+            |> Html.map PortListMessage
         ]
 
 
@@ -68,38 +69,3 @@ view model =
 -- hint_view hint =
 --     div [ class "hint" ]
 --         [ text hint ]
-
-
-stylesheet : Model -> Html Msg
-stylesheet m =
-    let
-        -- tag =
-        --     "link"
-        --
-        -- attrs =
-        --     [ attribute "rel" "stylesheet"
-        --     , attribute "property" "stylesheet"
-        --     , attribute "href" "css.css"
-        --     ]
-        tag =
-            "style"
-
-        attrs =
-            []
-
-        rule p =
-            "pre.log p[class^=\"port_"
-                ++ (toString p.cid)
-                ++ "\"] {"
-                ++ "color: "
-                ++ p.logColor
-                ++ ";}\n"
-
-        rules =
-            m.ports.ports
-                |> List.map (\( _, p ) -> rule p)
-                |> String.concat
-    in
-        node tag
-            attrs
-            [ text rules ]

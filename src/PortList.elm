@@ -1,11 +1,21 @@
-module PortList exposing (Msg(..), Model, defaultModel, view, add_button_view, update)
+module PortList
+    exposing
+        ( Msg(..)
+        , Model
+        , defaultModel
+        , update
+        , view
+        , add_button_view
+        , stylesheet
+        )
 
 -- module PortList exposing (Msg(..), Model, init, view, update)
 
-import Html exposing (Html, div, text, button)
+import Html exposing (Html, div, text, button, node)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Port
+import Icons exposing (..)
 
 
 type alias ID =
@@ -80,7 +90,7 @@ update msg model =
                                     Nothing ->
                                         ( ( portId, newPort ) :: ports, Cmd.map (PortMessage id) subCmd :: cmds )
 
-                                    Just (Port.Remove) ->
+                                    Just Port.Remove ->
                                         ( ports, cmds )
                         else
                             ( ( portId, portModel ) :: ports, cmds )
@@ -118,4 +128,39 @@ view model =
 
 add_button_view : Model -> Html Msg
 add_button_view model =
-    button [ onClick AddPort ] [ text "➕ Добавить порт" ]
+    button [ onClick AddPort ] [ mi_plus, text "Добавить порт" ]
+
+
+stylesheet : Model -> Html Msg
+stylesheet model =
+    let
+        -- tag =
+        --     "link"
+        --
+        -- attrs =
+        --     [ attribute "rel" "stylesheet"
+        --     , attribute "property" "stylesheet"
+        --     , attribute "href" "css.css"
+        --     ]
+        tag =
+            "style"
+
+        attrs =
+            []
+
+        rule p =
+            "pre.log p[class^=\"port_"
+                ++ (toString p.cid)
+                ++ "\"] {"
+                ++ "color: "
+                ++ p.logColor
+                ++ ";}\n"
+
+        rules =
+            model.ports
+                |> List.map (\( _, p ) -> rule p)
+                |> String.concat
+    in
+        node tag
+            attrs
+            [ text rules ]

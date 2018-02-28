@@ -12,7 +12,7 @@ module Log
         )
 
 import Date
-import Html exposing (Html, div, button, pre, p, text, span, a, mark, node, input)
+import Html exposing (Html, div, button, pre, p, text, span, a, mark, input)
 import Html.Attributes exposing (class, id, style, title, type_, placeholder, disabled)
 import Html.Events exposing (onClick, onInput)
 import Array exposing (Array)
@@ -21,6 +21,7 @@ import Task
 import Dom.Scroll
 import Serial
 import Json.Decode
+import Icons exposing (..)
 
 
 type alias LogLine =
@@ -130,7 +131,8 @@ update msg model =
                 , findResults = Array.empty
                 , findIndex =
                     0
-                    -- , hint = "Очищено"
+
+                -- , hint = "Очищено"
             }
                 ! [ scrollToBottom True ]
 
@@ -413,12 +415,13 @@ log_row l offset hightlight =
     p
         [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ]
         , class (logClassName l)
-          --   attribute
-          --     "style"
-          --     ("top: "
-          --         ++ toString ((toFloat offset) * logLineHeight)
-          --         ++ "px"
-          --     )
+
+        --   attribute
+        --     "style"
+        --     ("top: "
+        --         ++ toString ((toFloat offset) * logLineHeight)
+        --         ++ "px"
+        --     )
         ]
         [ div [ class "horizontal" ]
             [ a [] [ text (toString (offset + 1)) ]
@@ -505,13 +508,13 @@ onClickAddLabel labelType id =
                     labelChar =
                         case labelType of
                             LabelRegular ->
-                                "✅"
+                                "x"
 
                             LabelGood ->
-                                "🙂"
+                                "+"
 
                             LabelBad ->
-                                "🙁"
+                                "-"
 
                     fakeLogLine =
                         LogLine
@@ -529,8 +532,7 @@ scrollToLine : Int -> Cmd Msg
 scrollToLine line =
     Dom.Scroll.toY "log" (toFloat (line * 25))
         --logLineHeight
-        |>
-            Task.attempt (always NoOp)
+        |> Task.attempt (always NoOp)
 
 
 saveLogToFile : Array LogLine -> Cmd Msg
@@ -586,21 +588,21 @@ view_addLabel : Model -> Html Msg
 view_addLabel model =
     button
         [ title "Поставить метку", onClick (AddLabel LabelRegular) ]
-        [ text "✅" ]
+        [ mi_label ]
 
 
 view_markAsGood : Model -> Html Msg
 view_markAsGood model =
     button
         [ title "Пометить как хорошее", class "good", onClick (AddLabel LabelGood) ]
-        [ text "🙂" ]
+        [ mi_goodlabel ]
 
 
 view_markAsBad : Model -> Html Msg
 view_markAsBad model =
     button
         [ title "Пометить как плохое", class "bad", onClick (AddLabel LabelBad) ]
-        [ text "🙁" ]
+        [ mi_badlabel ]
 
 
 view_toPrevLabel : Model -> Html Msg
@@ -610,7 +612,7 @@ view_toPrevLabel model =
         , onClick ToPrevLabel
         , disabled (model.active_label <= 1)
         ]
-        [ text "⏮" ]
+        [ mi_prev ]
 
 
 view_toNextLabel : Model -> Html Msg
@@ -620,12 +622,12 @@ view_toNextLabel model =
         , onClick ToNextLabel
         , disabled (model.active_label == Array.length model.labels)
         ]
-        [ text "⏭" ]
+        [ mi_next ]
 
 
 view_startTimer : Model -> Html Msg
 view_startTimer model =
-    button [ title "Запустить секундомер" ] [ text "⏱" ]
+    button [ title "Запустить секундомер" ] [ mi_timer ]
 
 
 view_stopAutoScroll : Model -> Html Msg
@@ -640,7 +642,7 @@ view_stopAutoScroll model =
                 "active"
             )
         ]
-        [ text "⏸" ]
+        [ mi_stop ]
 
 
 view_startAutoScroll : Model -> Html Msg
@@ -655,18 +657,18 @@ view_startAutoScroll model =
                 ""
             )
         ]
-        [ text "▶️" ]
+        [ mi_play ]
 
 
 view_clearLog : Model -> Html Msg
 view_clearLog model =
-    button [ title "Очистить окно лога", onClick ClearLog ] [ text "🚮" ]
+    button [ title "Очистить окно лога", onClick ClearLog ] [ mi_clear ]
 
 
 view_find : Model -> Html Msg
 view_find model =
     div [ class "find" ]
-        [ text "🔍"
+        [ mi_search
         , input
             [ type_ "input"
             , placeholder "Поиск"
@@ -679,13 +681,13 @@ view_find model =
             , onClick PrevFindResult
             , disabled (model.findIndex <= 1)
             ]
-            [ text "🔼" ]
+            [ mi_prev ]
         , button
             [ title "Далее"
             , onClick NextFindResult
             , disabled (model.findIndex >= Array.length model.findResults)
             ]
-            [ text "🔽" ]
+            [ mi_next ]
         ]
 
 
@@ -693,7 +695,7 @@ view_save : Model -> Html Msg
 view_save model =
     button
         [ title "Сохранить в файл", onClick SaveLogToFile ]
-        [ text "💾" ]
+        [ mi_save ]
 
 
 gr : List (Html msg) -> Html msg
@@ -719,13 +721,16 @@ view_control_panel model =
             , view_startAutoScroll model
             ]
         , view_clearLog model
-        , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
-        , button [ title "Запись лога в облако" ] [ text "🌍" ]
+
+        -- , button [ title "Детектор данных для трекера" ] [ text "🛰" ]
+        -- , button [ title "Запись лога в облако" ] [ text "🌍" ]
         , view_find model
-        , button [ title "Заметка" ] [ text "ℹ️" ]
+
+        -- , button [ title "Заметка" ] [ text "ℹ️" ]
         , view_save model
-          -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
-        , button [ title "Настройки" ] [ text "🛠" ]
+
+        -- , button [ title "Обнимашки" ] [ text "\x1F917" ]
+        -- , button [ title "Настройки" ] [ text "🛠" ]
         ]
 
 

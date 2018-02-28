@@ -5,8 +5,6 @@ module Update
         , subscriptions
         )
 
--- import Task exposing (Task)
-
 import Serial
 import Types
     exposing
@@ -18,22 +16,6 @@ import Types
         )
 import PortList
 import Log
-
-
--- import Dom.Scroll
--- import Json.Decode
--- import Html
--- import Html.Events
--- import Array exposing (Array)
--- import Task
--- import Date
--- import Helpers
--- import Process
--- import Date
--- import Html.Attributes
--- import Dom
--- import Time
--- import Process
 
 
 init : ( Model, Cmd Msg )

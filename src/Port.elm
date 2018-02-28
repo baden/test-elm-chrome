@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Array exposing (Array)
 import Task exposing (Task)
 import Serial
+import Icons exposing (..)
 
 
 type alias Model =
@@ -18,9 +19,10 @@ type alias Model =
     , connected : Bool
     , portList :
         List Serial.Port
-        -- TODO: Заменить на Dict id Port
-        -- TODO: Нужно подумать над размещением в глобальной области видимости.
-        --       Или не стоит.
+
+    -- TODO: Заменить на Dict id Port
+    -- TODO: Нужно подумать над размещением в глобальной области видимости.
+    --       Или не стоит.
     }
 
 
@@ -186,9 +188,10 @@ fakeSpeedList =
     , "19200"
     , "38400"
     , "57600"
-      -- init : ( Model, Cmd Msg )
-      -- init =
-      --     ( defaultModel, Cmd.none )
+
+    -- init : ( Model, Cmd Msg )
+    -- init =
+    --     ( defaultModel, Cmd.none )
     , "115200"
     , "230400"
     , "460800"
@@ -231,7 +234,7 @@ view model =
                 , disabled ((model.path == "") || (model.boudrate == "") || (model.connected))
                 , onClick ConnectPort
                 ]
-                [ text "⏺" ]
+                [ mi_play ]
             , button
                 [ title "Остановить запись лога и отключить порт"
                 , disabled ((model.path == "") || (not model.connected))
@@ -241,10 +244,11 @@ view model =
                      else
                         "active"
                     )
-                  -- TODO: restore
+
+                -- TODO: restore
                 , onClick DisconnectPort
                 ]
-                [ text "⏹" ]
+                [ mi_stop ]
             ]
         , button
             [ class "colorpicker"
@@ -267,18 +271,20 @@ view model =
         , button
             [ title "Удалить"
             , disabled (model.connected)
-              -- TODO: restore
+
+            -- TODO: restore
             , onClick RemovePort
             ]
-            [ text "🚮" ]
-          -- 🞩
-          -- , text (toString model)
-          -- , text " / "
-          --   , text (toString (Serial.loadTime))
-          --   , text " / "
-          -- , text (toString (port_.id))
-          -- , text " / "
-          -- , text (toString (getColor port_.id))
+            [ mi_close ]
+
+        -- 🞩
+        -- , text (toString model)
+        -- , text " / "
+        --   , text (toString (Serial.loadTime))
+        --   , text " / "
+        -- , text (toString (port_.id))
+        -- , text " / "
+        -- , text (toString (getColor port_.id))
         ]
 
 
@@ -310,5 +316,4 @@ getSerialDevices id =
         --         in
         --             Task.succeed ( id, b )
         --     )
-        |>
-            Task.perform SetSerialDevices
+        |> Task.perform SetSerialDevices
