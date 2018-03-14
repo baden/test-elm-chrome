@@ -715,7 +715,8 @@ view_control_panel model =
             [ view_toPrevLabel model
             , view_toNextLabel model
             ]
-        , view_startTimer model
+
+        -- , view_startTimer model
         , gr
             [ view_stopAutoScroll model
             , view_startAutoScroll model

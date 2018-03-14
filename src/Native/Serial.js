@@ -118,12 +118,19 @@ var _baden$test_elm_chrome$Native_Serial = function() {
 
             });
 
-            chrome.serial.onReceiveError.addListener(function(info){
-                // console.log("port on receiveError", [info]);
-                var data = {id: 2, data: "Fake error string"};
-                var task = settings.onReceiveError(data);
-                _elm_lang$core$Native_Scheduler.rawSpawn(task);
+            chrome.serial.onReceiveError.addListener(function(errorInfo){
+                console.log("port on receiveError", [errorInfo]);
 
+                if(errorInfo.error == "break") {
+                    chrome.serial.setPaused(errorInfo.connectionId, false, function () {
+                      console.log("setPaused");
+                    });
+                } else {
+                    var data = {id: 2, data: "Fake error string"};
+                    var task = settings.onReceiveError(data);
+                    _elm_lang$core$Native_Scheduler.rawSpawn(task);
+
+                }
             });
 
             // What i must return?
