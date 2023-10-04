@@ -95,7 +95,7 @@ update msg model =
             in
             let
                 logCmd =
-                    Log.addPortMsg 0 "TDP" -- ev_line.id ev_line.data
+                    Log.addPortMsg ev_line.id ev_line.data
             in
                 (model, Cmd.map LogMessage logCmd )
 

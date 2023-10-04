@@ -28,8 +28,8 @@ type alias PortData =
 
 type alias PortLine =
     { id : Int
-    , timestamp : Int
-    , line : String
+    -- , timestamp : Int
+    , data : String
     }
 
 portDataEncode : PortData -> E.Value

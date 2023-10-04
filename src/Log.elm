@@ -138,8 +138,8 @@ update msg model =
 
         AddLogLine logLine ->
             let
-                -- _ =
-                --     Debug.log "AddLogLine" logLine
+                _ =
+                    Debug.log "AddLogLine" logLine
                 prev_timestamp =
                     dateToUnixtime model.last_timestamp
 
@@ -150,6 +150,7 @@ update msg model =
                     log_timestamp - prev_timestamp
 
                 new_logs =
+                    Debug.log "new_logs" <|
                     Array.push
                         { logLine
                             | delta = delta
@@ -364,7 +365,7 @@ view model =
 
         lines =
             if e.clientHeight < 1 then
-                100
+                10
             else
                 -- Пока размер окна не определен, будем считать что у нас 100 строк
                 e.clientHeight / logLineHeight + 1
@@ -392,7 +393,7 @@ view model =
             [ sliceLog start stop hightlight model.logs
                 |> pre
                     [ class "log"
-                    --, style [ ( "height", (String.fromFloat ((toFloat logSize) * logLineHeight)) ++ "px" ) ]
+                    , style "height" ((String.fromFloat ((toFloat logSize) * logLineHeight)) ++ "px" )
                     ]
             ]
 

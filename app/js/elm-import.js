@@ -71,8 +71,8 @@ app.ports.connectPort.subscribe(async function({id, baudrate}) {
                     chunk = chunk.substring(result.index + result[0].length);
                     // let line = chunk.substr(0);
                     console.log(`line [${line}]`, [line]);
-                    const timestamp = +new Date();
-                    app.ports.onPortReceive.send({id, timestamp, line});
+                    // const timestamp = +new Date();
+                    app.ports.onPortReceive.send({id/*, timestamp*/, data: line});
                     break;
                 }
 
