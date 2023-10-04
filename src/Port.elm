@@ -1,4 +1,4 @@
-module Port exposing (Msg, Model, ParentMgs(Remove), init, view, update)
+module Port exposing (Msg, Model, ParentMgs(..), init, view, update)
 
 import Html exposing (Html, div, button, option, text, select, input)
 import Html.Attributes exposing (class, value, title, disabled, type_, placeholder, selected)
@@ -11,14 +11,13 @@ import Icons exposing (..)
 
 type alias Model =
     { id : Int
-    , path : String
     , boudrate : String
     , name : String
     , cid : Int
     , logColor : String
     , connected : Bool
-    , portList :
-        List Serial.Port
+    -- , portList :
+    --     List Serial.Port
 
     -- TODO: Заменить на Dict id Port
     -- TODO: Нужно подумать над размещением в глобальной области видимости.
@@ -27,20 +26,19 @@ type alias Model =
 
 
 type Msg
-    = OnChangePortPath String
-    | OnChangePortBoudrate String
+    =
+    OnChangePortBoudrate String
     | OnChangeColorEvent String
     | ConnectPort
     | DisconnectPort
     | PortConnected ( String, Int )
     | PortDisconnected ( Int, Bool )
-    | SetSerialDevices (List Serial.Port)
+    -- | SetSerialDevices (List Serial.Port)
     | RemovePort
 
 
 type ParentMgs
     = Remove
-
 
 
 -- init : Int -> ( Model, Cmd Msg )
@@ -50,19 +48,17 @@ type ParentMgs
 
 init : Int -> ( Model, Cmd Msg )
 init id =
-    ( defaultModel id, Cmd.batch [ getSerialDevices id ] )
+    ( defaultModel id, getPort id )
 
 
 defaultModel : Int -> Model
 defaultModel id =
     { id = id
-    , path = ""
     , boudrate = ""
     , name = " "
     , cid = 0
     , logColor = (getColor id)
     , connected = False
-    , portList = []
     }
 
 
@@ -73,12 +69,6 @@ update msg model =
     --         Debug.log "Port.update" ( msg, model )
     -- in
     case msg of
-        OnChangePortPath value ->
-            ( { model | path = value }
-            , Cmd.none
-            , Nothing
-            )
-
         OnChangePortBoudrate value ->
             ( { model | boudrate = value }
             , Cmd.none
@@ -95,22 +85,25 @@ update msg model =
             ( model
             , Cmd.batch
                 [ Serial.connect
-                    ( model.path
-                    , String.toInt model.boudrate |> Result.withDefault 19200
-                    )
-                    PortConnected
+                    model.id
+                    (String.toInt model.boudrate |> Maybe.withDefault 19200)
+                    -- PortConnected
                 ]
             , Nothing
             )
 
         DisconnectPort ->
             ( model
-            , Cmd.batch [ Serial.disconnect model.cid PortDisconnected ]
+            , Cmd.batch
+                [ Serial.disconnect
+                    model.id
+                    --PortDisconnected
+                ]
             , Nothing
             )
 
-        PortConnected ( path, cid ) ->
-            ( { model | connected = True, cid = cid }
+        PortConnected id ->
+            ( { model | connected = True }
             , Cmd.none
             , Nothing
             )
@@ -121,11 +114,11 @@ update msg model =
             , Nothing
             )
 
-        SetSerialDevices ports ->
-            ( { model | portList = ports }
-            , Cmd.none
-            , Nothing
-            )
+        -- SetSerialDevices ports ->
+        --     ( { model | portList = ports }
+        --     , Cmd.none
+        --     , Nothing
+        --     )
 
         -- TODO: Dirty hack
         RemovePort ->
@@ -161,22 +154,22 @@ portLabel path name =
             path ++ " : " ++ name
 
 
-portOption : String -> Serial.Port -> Html a
-portOption active p =
-    let
-        options =
-            if p.path == active then
-                [ value p.path, selected True ]
-            else
-                [ value p.path ]
-    in
-        option options
-            [ text (portLabel p.path p.displayName) ]
+-- portOption : String -> Serial.Port -> Html a
+-- portOption active p =
+--     let
+--         options =
+--             if p.path == active then
+--                 [ value p.path, selected True ]
+--             else
+--                 [ value p.path ]
+--     in
+--         option options
+--             [ text (portLabel p.path p.displayName) ]
 
 
-listPorts : List Serial.Port -> String -> List (Html a)
-listPorts list selected =
-    (option [ value "" ] [ text "Порт" ]) :: (list |> List.map (portOption selected))
+-- listPorts : List Serial.Port -> String -> List (Html a)
+-- listPorts list selected =
+--     (option [ value "" ] [ text "Порт" ]) :: (list |> List.map (portOption selected))
 
 
 fakeSpeedList : List String
@@ -188,10 +181,6 @@ fakeSpeedList =
     , "19200"
     , "38400"
     , "57600"
-
-    -- init : ( Model, Cmd Msg )
-    -- init =
-    --     ( defaultModel, Cmd.none )
     , "115200"
     , "230400"
     , "460800"
@@ -210,13 +199,9 @@ gr =
 view : Model -> Html Msg
 view model =
     div [ class "port" ]
-        [ select
+        [
+        select
             [ disabled (model.connected)
-            , onInput <| OnChangePortPath
-            ]
-            (listPorts model.portList model.path)
-        , select
-            [ disabled ((model.path == "") || (model.connected))
             , onInput <| OnChangePortBoudrate
             ]
             (listToHtmlSelectOptions fakeSpeedList model.boudrate)
@@ -231,13 +216,13 @@ view model =
                                 " active"
                            )
                     )
-                , disabled ((model.path == "") || (model.boudrate == "") || (model.connected))
+                , disabled ((model.boudrate == "") || (model.connected))
                 , onClick ConnectPort
                 ]
                 [ mi_play ]
             , button
                 [ title "Остановить запись лога и отключить порт"
-                , disabled ((model.path == "") || (not model.connected))
+                , disabled (not model.connected)
                 , class
                     (if model.connected then
                         ""
@@ -253,13 +238,11 @@ view model =
         , button
             [ class "colorpicker"
             , title "Цвет текста лога"
-            , disabled (model.path == "")
             ]
             [ text "W"
             , input
                 [ type_ "color"
                 , value model.logColor
-                , disabled (model.path == "")
                 , onInput <| OnChangeColorEvent
                 ]
                 []
@@ -290,7 +273,7 @@ view model =
 
 getColor : Int -> String
 getColor i =
-    Array.get (i % Array.length portColors) portColors
+    Array.get (i |> modBy (Array.length portColors)) portColors
         |> Maybe.withDefault "black"
 
 
@@ -304,16 +287,21 @@ portColors =
         ]
 
 
-getSerialDevices : Int -> Cmd Msg
-getSerialDevices id =
-    -- Time.now
-    Serial.getDevices
-        -- |> Task.andThen
-        --     (\b ->
-        --         let
-        --             _ =
-        --                 Debug.log "getSerialDevices->then" b
-        --         in
-        --             Task.succeed ( id, b )
-        --     )
-        |> Task.perform SetSerialDevices
+-- getSerialDevices : Int -> Cmd Msg
+-- getSerialDevices id =
+--     -- Time.now
+--     Serial.getDevices
+--         -- |> Task.andThen
+--         --     (\b ->
+--         --         let
+--         --             _ =
+--         --                 Debug.log "getSerialDevices->then" b
+--         --         in
+--         --             Task.succeed ( id, b )
+--         --     )
+--         |> Task.perform SetSerialDevices
+
+getPort : Int -> Cmd Msg
+getPort id =
+    Serial.getPort id
+        -- |> Task.perform (Cmd.none)

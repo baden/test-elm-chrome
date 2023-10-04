@@ -5,7 +5,6 @@ module Update
         , subscriptions
         )
 
-import Serial
 import Types
     exposing
         ( -- Port
@@ -16,10 +15,11 @@ import Types
         )
 import PortList
 import Log
+import Serial
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Int -> ( Model, Cmd Msg )
+init _ =
     -- ( initModel, Cmd.batch [ getSerialDevices ] )
     ( initModel, Cmd.none )
 
@@ -71,64 +71,60 @@ update msg model =
     --         Debug.log "Update" ( msg, model )
     -- in
     case msg of
-        OnPortReceive ev_line ->
-            -- let
-            --     _ =
-            --         Debug.log "On port message" ev_line
-            -- in
+        OnPortConnected port_id ->
+            let
+                _ =
+                    Debug.log "On port connected" port_id
+            in
             let
                 logCmd =
-                    Log.addPortMsg ev_line.id ev_line.data
+                    Log.addPortMsg port_id "Connected"
             in
-                model ! [ Cmd.map LogMessage logCmd ]
+                (model, Cmd.map LogMessage logCmd )
+
+        OnPortReceive ev_line ->
+            let
+                _ =
+                    Debug.log "On port message" ev_line
+            in
+            let
+                logCmd =
+                    Log.addPortMsg 0 "TDP" -- ev_line.id ev_line.data
+            in
+                (model, Cmd.map LogMessage logCmd )
 
         OnPortReceiveError ev_line ->
-            -- let
-            --     _ =
-            --         Debug.log "On port error message" ev_line
-            -- in
+            let
+                _ =
+                    Debug.log "On port error message" ev_line
+            in
             let
                 logCmd =
-                    Log.addPortMsg ev_line.id ev_line.data
+                    Log.addPortMsg 0 "TDP" -- ev_line.id ev_line.data
             in
-                model ! [ Cmd.map LogMessage logCmd ]
+                (model, Cmd.map LogMessage logCmd)
 
         PortListMessage subMsg ->
             let
                 ( newPortList, subCmd ) =
                     PortList.update subMsg model.ports
             in
-                { model | ports = newPortList } ! [ Cmd.map PortListMessage subCmd ]
+                ({ model | ports = newPortList }, Cmd.map PortListMessage subCmd)
 
         LogMessage subMsg ->
             let
                 ( newLog, subCmd ) =
                     Log.update subMsg model.log
             in
-                { model | log = newLog } ! [ Cmd.map LogMessage subCmd ]
+                ({ model | log = newLog }, Cmd.map LogMessage subCmd)
 
         -- ( model, Cmd.none )
         Tick newTime ->
             ( { model | time = newTime }, Cmd.none )
 
         NoOp ->
-            model ! []
+            (model, Cmd.none)
 
-
-
--- Native.Scheduler.spawn (Serial.connect path PortConnected)
--- Serial.connect path
---     |> Task.perform PortConnected
--- DomError err ->
---     let
---         _ =
---             Debug.log "DOM error" (toString err)
---     in
---         ( model, Cmd.none )
--- TODO: Тут можно будет сразу передавать таймштамп
---
---     |> Task.perform AddLogLine
--- Cmd.batch [  ]
 
 
 subscriptions : Model -> Sub Msg
@@ -137,8 +133,8 @@ subscriptions model =
     --     _ =
     --         Debug.log "subscriptions" model.debug
     -- in
-    Serial.messages OnPortReceive OnPortReceiveError
-
-
-
--- Sub.none
+    Sub.batch [
+        Serial.onPortConnected OnPortConnected
+        , Serial.onPortReceive OnPortReceive
+        , Serial.onPortReceiveError OnPortReceiveError
+    ]

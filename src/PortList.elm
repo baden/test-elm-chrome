@@ -50,7 +50,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            model ! []
+            (model, Cmd.none)
 
         AddPort ->
             let
@@ -61,11 +61,12 @@ update msg model =
                     Port.init id
             in
                 -- TODO: Возможно стоит сделать обратный порядок?
-                { model
+                ({ model
                     | uid = model.uid + 1
                     , ports = model.ports ++ [ ( id, port_ ) ]
                 }
-                    ! [ Cmd.map (PortMessage id) subCmd ]
+                , Cmd.map (PortMessage id) subCmd
+                )
 
         -- PortMessage id (Port.RemovePort _) ->
         --     { model | ports = List.filter (\t -> t.id /= id) model.ports }
@@ -95,7 +96,7 @@ update msg model =
                         else
                             ( ( portId, portModel ) :: ports, cmds )
 
-                ( newPorts, cmds ) =
+                ( newPorts, newCmds ) =
                     model.ports
                         |> List.foldr f ( [], [] )
 
@@ -104,7 +105,7 @@ update msg model =
             in
                 -- { model | ports = newPorts } ! [ Cmd.map (PortMessage id) cmds ]
                 -- TODO: TBD
-                { model | ports = newPorts } ! cmds
+                ({ model | ports = newPorts }, Cmd.batch newCmds)
 
 
 
@@ -150,7 +151,7 @@ stylesheet model =
 
         rule p =
             "pre.log p[class^=\"port_"
-                ++ (toString p.cid)
+                ++ (String.fromInt p.cid)
                 ++ "\"] {"
                 ++ "color: "
                 ++ p.logColor

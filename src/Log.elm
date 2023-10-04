@@ -11,22 +11,23 @@ module Log
         , statusbar_view
         )
 
-import Date
+-- import Date
+import Time
 import Html exposing (Html, div, button, pre, p, text, span, a, mark, input)
 import Html.Attributes exposing (class, id, style, title, type_, placeholder, disabled)
 import Html.Events exposing (onClick, onInput)
 import Array exposing (Array)
 import Helpers
 import Task
-import Dom.Scroll
-import Serial
+-- import Dom.Scroll
+-- import Serial
 import Json.Decode
 import Icons exposing (..)
-
+import Serial
 
 type alias LogLine =
     { data : String
-    , timestamp : Date.Date
+    , timestamp : Time.Posix
     , delta : Float
     , sender : Sender
     }
@@ -59,7 +60,7 @@ type Msg
     | ToPrevLabel
     | EnableScroll Bool
     | SaveLogToFile
-    | SaveLogDone String
+    -- | SaveLogDone String
     | ChatScrolled OnScrollEvent
     | EnterFindText String
     | PressKeyOnFind Int
@@ -74,7 +75,7 @@ type alias Model =
     , last_labelid : Int
     , labels : Array Int
     , active_label : Int
-    , last_timestamp : Date.Date
+    , last_timestamp : Time.Posix
     , shouldScroll : Bool
     , findText : Maybe String
     , findIndex : Int
@@ -90,7 +91,7 @@ initModel =
     , last_labelid = 0
     , labels = Array.empty
     , active_label = 0
-    , last_timestamp = Date.fromTime 0
+    , last_timestamp = Time.millisToPosix 0
     , shouldScroll = False
     , findText = Nothing
     , findIndex = 0
@@ -123,18 +124,17 @@ update msg model =
             ( model, Cmd.none )
 
         ClearLog ->
-            { model
+            ({ model
                 | logs = Array.empty
                 , labels = Array.empty
                 , active_label = 0
                 , last_labelid = 0
                 , findResults = Array.empty
-                , findIndex =
-                    0
-
+                , findIndex = 0
                 -- , hint = "Очищено"
             }
-                ! [ scrollToBottom True ]
+            , scrollToBottom True
+            )
 
         AddLogLine logLine ->
             let
@@ -158,11 +158,12 @@ update msg model =
             in
                 case model.findIndex of
                     0 ->
-                        { model
+                        ({ model
                             | logs = new_logs
                             , last_timestamp = logLine.timestamp
                         }
-                            ! [ scrollToBottom model.autoscroll ]
+                        , scrollToBottom model.autoscroll
+                        )
 
                     _ ->
                         let
@@ -178,12 +179,13 @@ update msg model =
                                 else
                                     model.findResults
                         in
-                            { model
+                            ({ model
                                 | logs = new_logs
                                 , last_timestamp = logLine.timestamp
                                 , findResults = findResults
                             }
-                                ! [ scrollToBottom model.autoscroll ]
+                            , scrollToBottom model.autoscroll
+                            )
 
         AddLabel labelType ->
             let
@@ -213,7 +215,7 @@ update msg model =
                 -- _ =
                 --     Debug.log "to line" line
             in
-                { model | active_label = active_label } ! [ scrollToLine line ]
+                ({ model | active_label = active_label },  scrollToLine line)
 
         ToPrevLabel ->
             let
@@ -231,7 +233,7 @@ update msg model =
                 -- _ =
                 --     Debug.log "to line" line
             in
-                { model | active_label = active_label } ! [ scrollToLine line ]
+                ({ model | active_label = active_label }, scrollToLine line)
 
         EnableScroll scroll ->
             let
@@ -247,24 +249,25 @@ update msg model =
                 ( { model | autoscroll = scroll }, action )
 
         ChatScrolled event ->
-            { model
+            ({ model
                 | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
                 , scrollEvent = event
             }
-                ! []
+            , Cmd.none
+            )
 
         SaveLogToFile ->
             let
                 _ =
                     Debug.log "save" 0
             in
-                model ! [ saveLogToFile model.logs ]
+                (model, saveLogToFile model.logs )
 
-        SaveLogDone _ ->
-            model ! []
+        -- SaveLogDone _ ->
+        --     (model, Cmd.none)
 
         EnterFindText text ->
-            { model | findText = Just text, findIndex = 0 } ! []
+            ({ model | findText = Just text, findIndex = 0 }, Cmd.none)
 
         PressKeyOnFind key ->
             if key == 13 then
@@ -295,13 +298,13 @@ update msg model =
                             -- in
                             --     { model | findResults = results, findIndex = 1 } ! [ scrollToLine line ]
                         else
-                            { model | findResults = results, findIndex = 0 } ! []
+                            ({ model | findResults = results, findIndex = 0 }, Cmd.none)
                 else if model.findIndex < Array.length model.findResults then
                     model |> update NextFindResult
                 else
-                    model ! []
+                    (model, Cmd.none)
             else
-                { model | findResults = Array.empty, findIndex = 0 } ! []
+                ({ model | findResults = Array.empty, findIndex = 0 }, Cmd.none)
 
         NextFindResult ->
             let
@@ -316,7 +319,7 @@ update msg model =
                         _ ->
                             0
             in
-                { model | findIndex = index } ! [ scrollToLine line ]
+                ({ model | findIndex = index }, scrollToLine line )
 
         PrevFindResult ->
             let
@@ -331,7 +334,7 @@ update msg model =
                         _ ->
                             0
             in
-                { model | findIndex = index } ! [ scrollToLine line ]
+                ({ model | findIndex = index }, scrollToLine line)
 
 
 scrollToBottom : Bool -> Cmd Msg
@@ -339,8 +342,12 @@ scrollToBottom scroll =
     -- Task.perform DomError (always NoOp) (toBottom id)
     case scroll of
         True ->
-            Dom.Scroll.toBottom "log"
-                |> Task.attempt (always NoOp)
+            let
+                _ = Debug.log "TODO: scrollToBottom" "TODO"
+            in
+                -- Dom.Scroll.toBottom "log"
+                --     |> Task.attempt (always NoOp)
+                Cmd.none
 
         False ->
             Cmd.none
@@ -356,13 +363,11 @@ view model =
             Array.length model.logs
 
         lines =
-            case e.clientHeight of
-                0 ->
-                    100
-
+            if e.clientHeight < 1 then
+                100
+            else
                 -- Пока размер окна не определен, будем считать что у нас 100 строк
-                h ->
-                    h / logLineHeight + 1
+                e.clientHeight / logLineHeight + 1
 
         startLine =
             e.top / logLineHeight
@@ -387,7 +392,7 @@ view model =
             [ sliceLog start stop hightlight model.logs
                 |> pre
                     [ class "log"
-                    , style [ ( "height", (toString ((toFloat logSize) * logLineHeight)) ++ "px" ) ]
+                    --, style [ ( "height", (String.fromFloat ((toFloat logSize) * logLineHeight)) ++ "px" ) ]
                     ]
             ]
 
@@ -413,8 +418,8 @@ logLineHeight =
 log_row : LogLine -> Int -> Maybe String -> Html Msg
 log_row l offset hightlight =
     p
-        [ style [ ( "top", toString ((toFloat offset) * logLineHeight) ++ "px" ) ]
-        , class (logClassName l)
+        [ -- style [ ( "top", String.fromFloat ((toFloat offset) * logLineHeight) ++ "px" ) ]
+        class (logClassName l)
 
         --   attribute
         --     "style"
@@ -424,7 +429,7 @@ log_row l offset hightlight =
         --     )
         ]
         [ div [ class "horizontal" ]
-            [ a [] [ text (toString (offset + 1)) ]
+            [ a [] [ text (String.fromInt (offset + 1)) ]
             , span [ class "time" ] [ text (Helpers.dateToTime l.timestamp) ]
             , span [ class "delta" ] [ text (Helpers.deltaAsString l.delta) ]
             , span [ class "content" ] (maybeHiglight l.data hightlight)
@@ -466,15 +471,15 @@ logClassName : LogLine -> String
 logClassName l =
     case l.sender of
         PortId id ->
-            "port_" ++ (toString id)
+            "port_" ++ (String.fromInt id)
 
         LabelId id ->
-            "label_" ++ (toString id)
+            "label_" ++ (String.fromInt id)
 
 
 addPortMsg : Int -> String -> Cmd Msg
 addPortMsg id text =
-    Date.now
+    Time.now
         |> Task.andThen
             (\now ->
                 let
@@ -490,7 +495,7 @@ addPortMsg id text =
         |> Task.perform AddLogLine
 
 
-fakeLog : Int -> Date.Date -> String -> LogLine
+fakeLog : Int -> Time.Posix -> String -> LogLine
 fakeLog id timestamp data =
     LogLine
         data
@@ -501,7 +506,7 @@ fakeLog id timestamp data =
 
 onClickAddLabel : LabelType -> Int -> Cmd Msg
 onClickAddLabel labelType id =
-    Date.now
+    Time.now
         |> Task.andThen
             (\now ->
                 let
@@ -518,7 +523,7 @@ onClickAddLabel labelType id =
 
                     fakeLogLine =
                         LogLine
-                            ("Метка " ++ labelChar ++ (toString id))
+                            ("Метка " ++ labelChar ++ (String.fromInt id))
                             now
                             0
                             (LabelId 0)
@@ -530,9 +535,13 @@ onClickAddLabel labelType id =
 
 scrollToLine : Int -> Cmd Msg
 scrollToLine line =
-    Dom.Scroll.toY "log" (toFloat (line * 25))
-        --logLineHeight
-        |> Task.attempt (always NoOp)
+    -- Dom.Scroll.toY "log" (toFloat (line * 25))
+    --     --logLineHeight
+    --     |> Task.attempt (always NoOp)
+    let
+        _ = Debug.log "TODO: scrollToLine" "TODO"
+    in
+    Cmd.none
 
 
 saveLogToFile : Array LogLine -> Cmd Msg
@@ -552,7 +561,7 @@ saveLogToFile logs =
                     )
                     []
     in
-        Serial.save logs_as_list SaveLogDone
+        Serial.save logs_as_list -- SaveLogDone
 
 
 onScroll : (OnScrollEvent -> msg) -> Html.Attribute msg
@@ -575,9 +584,11 @@ onScrollJsonParser =
         (Json.Decode.at [ "target", "clientHeight" ] Json.Decode.float)
 
 
-dateToUnixtime : Date.Date -> Float
+dateToUnixtime : Time.Posix -> Float
 dateToUnixtime date =
-    (Date.toTime date) / 1000
+    -- (Date.toTime date) / 1000
+    Time.posixToMillis date
+        |> toFloat
 
 
 
@@ -740,10 +751,10 @@ statusbar_view model =
     div [ class "statusbar" ]
         [ div
             [ class "horizontal" ]
-            [ div [] [ text ("Строк лога: " ++ (toString (logs_count model))) ]
-            , div [] [ text ("Метка: " ++ (toString model.active_label) ++ "/" ++ (toString (Array.length model.labels))) ]
-            , div [] [ text ("Результат поиска: " ++ (toString model.findIndex) ++ "/" ++ (toString (Array.length model.findResults))) ]
+            [ div [] [ text ("Строк лога: " ++ (String.fromInt (logs_count model))) ]
+            , div [] [ text ("Метка: " ++ (String.fromInt model.active_label) ++ "/" ++ (String.fromInt (Array.length model.labels))) ]
+            , div [] [ text ("Результат поиска: " ++ (String.fromInt model.findIndex) ++ "/" ++ (String.fromInt (Array.length model.findResults))) ]
             , div [ class "fill" ] [ text "Тут могла бы быть ваша реклама." ]
-            , div [] [ text "©2017 Денис Батрак (baden.i.ua@gmail.com)" ]
+            , div [] [ text "©2023 Денис Батрак (baden.i.ua@gmail.com)" ]
             ]
         ]

@@ -9,21 +9,15 @@ module Types
 -- import Array exposing (Array)
 
 import Time
-import Serial.LowLevel as SLL
-import PortList
 import Log
-
-
--- import Time exposing (Time)
--- import Time exposing (Time)
--- import Dom
+import PortList
 
 
 type alias Model =
     { uid : Int
     , ports : PortList.Model
     , log : Log.Model
-    , time : Time.Time
+    , time : Time.Posix
     , debug :
         String
         -- , hint : String
@@ -35,7 +29,7 @@ initModel =
     { uid = 0
     , ports = PortList.defaultModel
     , log = Log.initModel
-    , time = 0
+    , time = Time.millisToPosix 0
     , debug =
         ""
         -- , hint = "Бульк"
@@ -44,11 +38,11 @@ initModel =
 
 type Msg
     = PortListMessage PortList.Msg
-      -- | AddPort
     | LogMessage Log.Msg
-    | OnPortReceive SLL.Event
-    | OnPortReceiveError SLL.Event
-    | Tick Time.Time
+    | OnPortConnected Int -- SLL.Event
+    | OnPortReceive String -- SLL.Event
+    | OnPortReceiveError String -- SLL.Event
+    | Tick Time.Posix
     | NoOp
 
 
