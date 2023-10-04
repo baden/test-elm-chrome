@@ -24,6 +24,7 @@ import Task
 import Json.Decode
 import Icons exposing (..)
 import Serial
+import Browser.Dom as Dom
 
 type alias LogLine =
     { data : String
@@ -250,6 +251,9 @@ update msg model =
                 ( { model | autoscroll = scroll }, action )
 
         ChatScrolled event ->
+            let
+                _ = Debug.log "ChatScrolled" event
+            in
             ({ model
                 | shouldScroll = event.top < (event.height * 0.99 - event.clientHeight)
                 , scrollEvent = event
@@ -338,21 +342,32 @@ update msg model =
                 ({ model | findIndex = index }, scrollToLine line)
 
 
+-- scrollToBottom : Bool -> Cmd Msg
+-- scrollToBottom scroll =
+--     -- Task.perform DomError (always NoOp) (toBottom id)
+--     case scroll of
+--         True ->
+--             let
+--                 _ = Debug.log "TODO: scrollToBottom" "TODO"
+--             in
+--                 -- Dom.Scroll.toBottom "log"
+--                 --     |> Task.attempt (always NoOp)
+--                 Cmd.none
+
+--         False ->
+--             Cmd.none
+
+
 scrollToBottom : Bool -> Cmd Msg
 scrollToBottom scroll =
-    -- Task.perform DomError (always NoOp) (toBottom id)
     case scroll of
         True ->
-            let
-                _ = Debug.log "TODO: scrollToBottom" "TODO"
-            in
-                -- Dom.Scroll.toBottom "log"
-                --     |> Task.attempt (always NoOp)
-                Cmd.none
+            Dom.getViewportOf "log"
+                |> Task.andThen (\info -> Dom.setViewportOf "log" 0 info.scene.height)
+                |> Task.attempt (\_ -> NoOp)
 
         False ->
             Cmd.none
-
 
 view : Model -> Html Msg
 view model =
@@ -363,21 +378,24 @@ view model =
         logSize =
             Array.length model.logs
 
+        lines : Int
         lines =
+            Debug.log "lines" <|
             if e.clientHeight < 1 then
-                10
+                100
             else
                 -- Пока размер окна не определен, будем считать что у нас 100 строк
-                e.clientHeight / logLineHeight + 1
+                round <| e.clientHeight / logLineHeight + 1
 
+        startLine : Int
         startLine =
-            e.top / logLineHeight
+            round <| e.top / logLineHeight
 
         start =
-            max 0 ((round startLine) - 10)
+            max 0 (startLine - 10)
 
         stop =
-            min logSize ((round (startLine + lines)) + 10)
+            min logSize (startLine + lines + 10)
 
         hightlight =
             if model.findIndex == 0 then
@@ -402,6 +420,7 @@ sliceLog : Int -> Int -> Maybe String -> Array LogLine -> List (Html Msg)
 sliceLog start stop hightlight logs =
     -- [ ("Show from " ++ (toString start) ++ " to " ++ (toString stop)) ]
     let
+        _ = Debug.log "sliceLog" (start, stop)
         f : LogLine -> ( Int, List (Html Msg) ) -> ( Int, List (Html Msg) )
         f =
             \d ( index, acc ) -> ( index + 1, log_row d index hightlight :: acc )
@@ -419,8 +438,8 @@ logLineHeight =
 log_row : LogLine -> Int -> Maybe String -> Html Msg
 log_row l offset hightlight =
     p
-        [ -- style [ ( "top", String.fromFloat ((toFloat offset) * logLineHeight) ++ "px" ) ]
-        class (logClassName l)
+        [ style "top"  ( String.fromFloat ((toFloat offset) * logLineHeight) ++ "px" )
+        , class (logClassName l)
 
         --   attribute
         --     "style"
