@@ -2,6 +2,7 @@ port module Serial exposing (..)
 -- import Types exposing (Msg(..))
 
 port getPort : Int -> Cmd msg
+port connectPort : (Int, Int) -> Cmd msg
 
 port onPortGeted : (Int -> msg) -> Sub msg
 -- port onPortConnected : Int -> Cmd msg
@@ -23,7 +24,7 @@ connect id baudrate =
         _ = Debug.log "connect" id
         _ = Debug.log "connect" baudrate
     in
-        Cmd.none
+        connectPort (id, baudrate)
 
 disconnect : Int -> Cmd msg
 disconnect id =

@@ -49,10 +49,10 @@ type Msg
     | PortMessage ID Port.Msg
 
 
--- getPort : Int -> Cmd Msg
--- getPort id =
---     Serial.getPort id
---         |> Task.perform AddPort
+getPort : Int -> Cmd Msg
+getPort id =
+    Serial.getPort id
+        -- |> Task.andThen (Port.init id >> (\( pport, cmd ) -> Cmd.map (PortMessage id) cmd))
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =

@@ -44,3 +44,9 @@ app.ports.getPorts.subscribe(async function(message) {
 
   // await port.open({ baudRate: 9600 });
 });
+
+app.ports.connectPort.subscribe(async function(arg) {
+    const [id, baudRate] = arg;
+    console.log('connectPort', id, baudRate);
+    // const port = await navigator.serial.requestPort();
+});
