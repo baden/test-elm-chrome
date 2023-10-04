@@ -14,7 +14,7 @@ all: $(DIST_JS)
 $(DIST_JS): $(SRCS) $(APP_SRC) $(NATIVES) Makefile
 	@mkdir -p $(dir $@)
 	@elm make $(MAIN) --output=$@
-	cp -R ./app/* $(DIST)
+	cp -Rf ./app/* $(DIST)
 
 app: $(DIST_JS)
 	npm i

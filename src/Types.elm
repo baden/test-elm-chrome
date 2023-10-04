@@ -11,6 +11,7 @@ module Types
 import Time
 import Log
 import PortList
+import Serial
 
 
 type alias Model =
@@ -41,7 +42,7 @@ type Msg
     | LogMessage Log.Msg
     | OnPortGeted Int
     | OnPortConnected Int -- SLL.Event
-    | OnPortReceive String -- SLL.Event
+    | OnPortReceive Serial.PortLine -- SLL.Event
     | OnPortReceiveError String -- SLL.Event
     | Tick Time.Posix
     | NoOp
