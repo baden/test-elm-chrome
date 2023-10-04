@@ -15,8 +15,10 @@ import Html exposing (Html, div, text, button, node)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Port
+import Serial
 import Icons exposing (..)
-
+-- import Platform exposing (Task)
+import Task
 
 type alias ID =
     Int
@@ -42,9 +44,15 @@ defaultModel =
 
 type Msg
     = NoOp
-    | AddPort
+    | GetPort
+    | AddPort ID
     | PortMessage ID Port.Msg
 
+
+-- getPort : Int -> Cmd Msg
+-- getPort id =
+--     Serial.getPort id
+--         |> Task.perform AddPort
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -52,18 +60,23 @@ update msg model =
         NoOp ->
             (model, Cmd.none)
 
-        AddPort ->
+        GetPort ->
             let
                 id =
-                    model.uid
+                    model.uid + 1
+            in
+                ( { model | uid = id }
+                , Serial.getPort id --|> Task.perform (AddPort id)
+                )
 
+        AddPort id ->
+            let
                 ( port_, subCmd ) =
                     Port.init id
             in
                 -- TODO: Возможно стоит сделать обратный порядок?
                 ({ model
-                    | uid = model.uid + 1
-                    , ports = model.ports ++ [ ( id, port_ ) ]
+                    | ports = model.ports ++ [ ( id, port_ ) ]
                 }
                 , Cmd.map (PortMessage id) subCmd
                 )
@@ -129,7 +142,7 @@ view model =
 
 add_button_view : Model -> Html Msg
 add_button_view model =
-    button [ onClick AddPort ] [ mi_plus, text "Добавить порт" ]
+    button [ onClick GetPort ] [ mi_plus, text "Добавить порт" ]
 
 
 stylesheet : Model -> Html Msg

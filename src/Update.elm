@@ -13,12 +13,12 @@ import Types
         , Model
         , Msg(..)
         )
-import PortList
+import PortList exposing (Msg(..))
 import Log
 import Serial
 
 
-init : Int -> ( Model, Cmd Msg )
+init : Int -> ( Model, Cmd Types.Msg )
 init _ =
     -- ( initModel, Cmd.batch [ getSerialDevices ] )
     ( initModel, Cmd.none )
@@ -64,13 +64,19 @@ init _ =
 --         (Types.LabelId 0)
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Types.Msg -> Model -> ( Model, Cmd Types.Msg )
 update msg model =
     -- let
     --     _ =
     --         Debug.log "Update" ( msg, model )
     -- in
     case msg of
+        OnPortGeted id ->
+            let
+                _ = Debug.log "On port geted" id
+                (p_model, p_cmd) = PortList.update (PortList.AddPort id) model.ports
+            in
+                ({ model | ports = p_model }, Cmd.map PortListMessage p_cmd)
         OnPortConnected port_id ->
             let
                 _ =
@@ -122,19 +128,20 @@ update msg model =
         Tick newTime ->
             ( { model | time = newTime }, Cmd.none )
 
-        NoOp ->
+        Types.NoOp ->
             (model, Cmd.none)
 
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Model -> Sub Types.Msg
 subscriptions model =
     -- let
     --     _ =
     --         Debug.log "subscriptions" model.debug
     -- in
     Sub.batch [
-        Serial.onPortConnected OnPortConnected
+        Serial.onPortGeted OnPortGeted
+        , Serial.onPortConnected OnPortConnected
         , Serial.onPortReceive OnPortReceive
         , Serial.onPortReceiveError OnPortReceiveError
     ]

@@ -1,4 +1,6 @@
-module Port exposing (Msg, Model, ParentMgs(..), init, view, update)
+module Port exposing (
+    Msg, Model, ParentMgs(..), init, view, update
+    )
 
 import Html exposing (Html, div, button, option, text, select, input)
 import Html.Attributes exposing (class, value, title, disabled, type_, placeholder, selected)
@@ -41,6 +43,7 @@ type ParentMgs
     = Remove
 
 
+
 -- init : Int -> ( Model, Cmd Msg )
 -- init id =
 --     ( defaultModel id, Cmd.none )
@@ -48,7 +51,7 @@ type ParentMgs
 
 init : Int -> ( Model, Cmd Msg )
 init id =
-    ( defaultModel id, getPort id )
+    ( defaultModel id, Cmd.none )
 
 
 defaultModel : Int -> Model
@@ -301,7 +304,7 @@ portColors =
 --         --     )
 --         |> Task.perform SetSerialDevices
 
-getPort : Int -> Cmd Msg
-getPort id =
-    Serial.getPort id
-        -- |> Task.perform (Cmd.none)
+-- getPort : Int -> Cmd Msg
+-- getPort id =
+--     Serial.getPort id
+--         -- |> Task.perform (Cmd.none)

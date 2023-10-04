@@ -2,6 +2,8 @@ port module Serial exposing (..)
 -- import Types exposing (Msg(..))
 
 port getPort : Int -> Cmd msg
+
+port onPortGeted : (Int -> msg) -> Sub msg
 -- port onPortConnected : Int -> Cmd msg
 port onPortConnected : (Int -> msg) -> Sub msg
 port onPortReceive : (String -> msg) -> Sub msg

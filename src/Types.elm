@@ -39,6 +39,7 @@ initModel =
 type Msg
     = PortListMessage PortList.Msg
     | LogMessage Log.Msg
+    | OnPortGeted Int
     | OnPortConnected Int -- SLL.Event
     | OnPortReceive String -- SLL.Event
     | OnPortReceiveError String -- SLL.Event
