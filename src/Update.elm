@@ -84,15 +84,15 @@ update msg model =
             in
             let
                 logCmd =
-                    Log.addPortMsg port_id "Connected"
+                    Log.addPortMsg port_id <| "Connected:" ++ (String.fromInt port_id)
             in
                 (model, Cmd.map LogMessage logCmd )
 
         OnPortReceive ev_line ->
-            let
-                _ =
-                    Debug.log "On port message" ev_line
-            in
+            -- let
+            --     _ =
+            --         Debug.log "On port message" ev_line
+            -- in
             let
                 logCmd =
                     Log.addPortMsg ev_line.id ev_line.data

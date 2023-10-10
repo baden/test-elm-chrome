@@ -46,6 +46,7 @@ app.ports.connectPort.subscribe(async function({id, baudrate}) {
     let chunk = "";
 
     console.log('TODO: connected', id);
+    app.ports.onPortConnected.send(id);
     while (port.readable) {
         const reader = port.readable.getReader();
         let startIndex = 0;
@@ -87,6 +88,7 @@ app.ports.connectPort.subscribe(async function({id, baudrate}) {
         }
     }
     console.log('TODO:disconnected', id);
+    app.ports.onPortDisconnected.send(id);
 });
 
 

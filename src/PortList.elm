@@ -164,7 +164,7 @@ stylesheet model =
 
         rule p =
             "pre.log p[class^=\"port_"
-                ++ (String.fromInt p.cid)
+                ++ (String.fromInt p.id)
                 ++ "\"] {"
                 ++ "color: "
                 ++ p.logColor

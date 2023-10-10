@@ -15,7 +15,6 @@ type alias Model =
     { id : Int
     , boudrate : String
     , name : String
-    , cid : Int
     , logColor : String
     , connected : Bool
     -- , portList :
@@ -33,8 +32,8 @@ type Msg
     | OnChangeColorEvent String
     | ConnectPort
     | DisconnectPort
-    | PortConnected ( String, Int )
-    | PortDisconnected ( Int, Bool )
+    | PortConnected Int
+    | PortDisconnected Int
     -- | SetSerialDevices (List Serial.Port)
     | RemovePort
 
@@ -57,9 +56,8 @@ init id =
 defaultModel : Int -> Model
 defaultModel id =
     { id = id
-    , boudrate = ""
+    , boudrate = "115200"
     , name = " "
-    , cid = 0
     , logColor = (getColor id)
     , connected = False
     }
@@ -111,8 +109,10 @@ update msg model =
             , Nothing
             )
 
-        PortDisconnected ( cid, result ) ->
-            ( { model | connected = False, cid = 0 }
+        PortDisconnected id  ->
+            ( { model | connected = False
+            -- , id = 0
+            }
             , Cmd.none
             , Nothing
             )
