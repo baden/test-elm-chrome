@@ -1,0 +1,32 @@
+{
+    "manifest_version": 2,
+
+    "name": "Loger/3",
+    "description": "This is just a minimalistic example of how to build a Chrome extension with Elm",
+    "version": "0.0.1",
+
+    "icons": {
+        "16": "images/search-16.png",
+        "128": "images/search-128.png"
+    },
+
+    "app": {
+		"background": {
+			"scripts": [
+				"scripts/background.js"
+			]
+		}
+	},
+
+    "permissions": [
+		"clipboardWrite",
+		"serial",
+		{
+			"fileSystem": [
+				"write"
+			]
+		},
+		"http://*/*",
+		"https://*/*"
+	]
+}

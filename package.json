@@ -1,0 +1,22 @@
+{
+    "name": "nw-tty-logger",
+    "version": "0.0.1",
+    "main": "index.html",
+    "window": {
+        "width": 980,
+        "height": 600,
+        "bounds": {
+            "width": 980,
+            "height": 600
+        },
+        "min_width": 512,
+        "min_height": 256,
+        "icon": "images/search-128.png"
+    },
+    "webkit": {
+        "plugin": true,
+        "page-cache": false
+    },
+    "dependencies": {
+    }
+}

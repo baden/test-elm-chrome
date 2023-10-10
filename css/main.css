@@ -1,0 +1,495 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    /*margin: 20px;*/
+    /*font-size: 100%;*/
+    overflow: hidden;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+
+.material-icons {
+    vertical-align: bottom;
+}
+
+
+
+.workspace {
+    width: 100%;
+    height: 100%;
+    /*background-color: #f5f5ff;*/
+    /*background-color: #eee;*/
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #888;
+}
+
+.vertical {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    -webkit-app-region: drag;
+    padding: 6px;
+    border-bottom: 1px solid rgba(0,0,0, 0.5);
+}
+
+.toolbox {
+    margin: 0;
+    padding: 0;
+    /*border-bottom: 1px solid rgba(0,0,0, 0.5);*/
+    position: relative;
+    /*opacity: 0.7;*/
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+
+.log {
+    /*border: 1px solid #ccc;*/
+    margin: 2px;
+    position: relative;
+    -webkit-flex: auto;
+    overflow-y: scroll;
+    -webkit-user-select: text;
+}
+
+pre.log {
+    clear: left;
+    font-family: monospace;
+    font-size: 16px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    /*counter-reset: line-numbering;*/
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    margin: 0;
+    /*border-bottom: 1px solid rgba(0,0,0, 0.5);*/
+    box-shadow: inset 0px -10px 10px -10px rgba(0,0,0,0.1);
+    /*box-shadow: inset 0px 0px 8px rgba(0,0,0,1.5);*/
+}
+
+pre.log p {
+    position: absolute;
+    height: 25px;
+    width: 100%;
+
+    padding: 0 15px;
+    margin: 0;
+    min-height: 16px;
+    /*font-weight: bold;*/
+    border: none;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.horizontal > div {
+    margin: 0 1px;
+    padding: 1px 5px;
+    /*border: 1px solid #ccc;*/
+    box-shadow: inset 0px 0px 4px rgba(127,127,127,0.5);
+}
+
+.horizontal > div:first-child {
+    margin-left: -1px;
+}
+
+.horizontal > div:last-child {
+    margin-right: -1px;
+}
+
+.horizontal .fill {
+    position: relative;
+    -webkit-flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* word-break: break-all; */
+    white-space: nowrap;
+}
+
+
+pre.log p a {
+    position: relative;
+    display: inline-block;
+    text-align: right;
+    min-width: 60px;
+    margin-left: -16px;
+    margin-right: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+pre.log p span.time {
+    position: relative;
+    color: #888;
+    padding-left: 20px;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #ccc;
+}
+
+pre.log p span.delta {
+    position: relative;
+    display: inline-block;
+    text-align: right;
+    min-width: 100px;
+    color: #888;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #ccc;
+}
+
+/*pre.log p[class^="port_"] {
+    color: red;
+}*/
+
+pre.log p span.content {
+    position: relative;
+    -webkit-flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* word-break: break-all; */
+    white-space: nowrap;
+}
+
+.log-control-panel {
+    display: inline;
+}
+
+.hint {
+    position: absolute;
+    pointer-events: none;
+    width: 80px;
+    height: 30px;
+    left: 20px;
+    top: 100px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    box-shadow: 1px 2px 10px rgba(0,0,0,0.2);
+    background-color: white;
+}
+
+
+pre.log p[class^="label_"] span.content {
+    color: green;
+    /*text-align: center;*/
+}
+
+/*pre.log p[class^="label_"] span.content:before,
+pre.log p[class^="label_"] span.content:after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 9999px;
+    height: 2px;
+    background: #ddd;
+}
+
+pre.log p[class^="label_"] span.content:before {
+    right: 100%;
+    margin-right: 15px;
+}
+
+pre.log p[class^="label_"] span.content:after {
+    left: 100%;
+    margin-left: 15px;
+}*/
+
+pre.log p[class^="label_"] span.content:after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 0;
+    left: 102px;
+    height: 2px;
+    background: green;
+}
+
+
+a {
+    color: #428bca;
+    text-decoration: none;
+    background: transparent;
+}
+
+img, a {
+    -webkit-user-drag: none;
+}
+
+/*pre.log p a::before {
+  content: counter(line-numbering, decimal);
+  counter-increment: line-numbering;
+  padding-right: 1em;
+}*/
+
+button, select, .control span {
+    /*padding: 4px 8px;*/
+    padding: 0 6px;
+    margin: 2px;
+    height: 30px;
+    min-height: 30px;
+    font-family: 'Open Sans Condensed', sans-serif;
+    text-shadow: 0 1px 0 rgb(240, 240, 240);
+    font-size: 18px;
+    /*background: transparent;*/
+    background: #fff;
+    /*-webkit-appearance: none;
+    appearance: none;*/
+    border: 1px solid #ccc;
+    min-width: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+.find, .label {
+    display: inline-block;
+    position: relative;
+    padding: 1px 0px 0px 8px;
+    margin: 2px;
+    height: 30px;
+    min-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.label {
+    padding: 4px 0px 0px 8px;
+}
+
+
+.find button, .find input, .label button, .label input {
+    padding: 2px 8px;
+    margin: -2px 0 0 0;
+    border: none;
+    background: none;
+}
+
+.find input {
+    border-right: 1px solid #ccc;
+    margin-right: 4px;
+}
+
+.label input {
+    margin-right: 4px;
+    width: 80px;
+}
+
+.find input:hover, .label input:hover {
+    border-bottom: 1px solid #ccc;
+}
+
+.find input:focus, .label input:focus {
+    outline: none;
+}
+
+
+.button-group {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.button-group button {
+    /*background-color: red;*/
+    border-radius: 0;
+}
+
+.button-group button:first-child {
+    /*background-color: red;*/
+    border-radius: 8px 0 0 8px;
+}
+
+.button-group button:last-child {
+    /*background-color: red;*/
+    border-radius: 0 8px 8px 0;
+}
+
+.button-group button:not(:first-child) {
+    /*background-color: red;*/
+    margin-left: -1px;
+}
+
+
+button.record {
+    color: #a00;
+}
+
+:focus {
+    /*outline: #666 auto 5px;*/
+    box-shadow: 0px 0px 2px green;
+    outline: none;
+}
+
+button[disabled], button.record[disabled] {
+    color: gray;
+    /*opacity: 0.1;*/
+}
+
+button.colorpicker {
+    position: relative;
+    max-width: 29px;
+    /*padding: 0px;
+    margin: 0 2px;
+    top: 8px;
+    height: 30px;
+    position: relative;
+    width: 29px;*/
+}
+
+input[type="color"] {
+    /*padding: 0px;
+    margin: 0px;
+    height: 24px;
+    width: 24px;*/
+    /*background: #fff;*/
+    background: none;
+    -webkit-appearance: none;
+    border: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    margin: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+input[type="color" i] {
+    padding: 3px;
+    margin: 0;
+    height: 28px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 28px;
+}
+
+
+button.active {
+    background: #cee3fd;
+    /*color: white;*/
+    text-shadow: none;
+}
+
+button.good {
+    /*font-weight: bold;*/
+    color: #090;
+}
+
+button.bad {
+    /*color: red;*/
+    color: #900;
+}
+
+button:hover:enabled, select:hover:enabled {
+    /*background: #eee;*/
+    box-shadow: inset 0px 0px 8px rgba(127,127,255,0.5);
+    /*border: 1px solid #444;*/
+}
+
+/*:focus {
+    outline: #666 auto 5px;
+}*/
+
+
+.debug {
+    border: 1px solid #888;
+    margin: 2px;
+    padding: 2px 4px;
+    position: absolute;
+    width: 300px;
+    height: 170px;
+    right: 30px;
+    bottom: 40px;
+    overflow: scroll;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.3);
+    background-color: white;
+    opacity: 0.8;
+}
+
+.debug p {
+    margin: 0;
+    padding: 0;
+}
+
+.statusbar {
+    margin: 0;
+    padding: 2px 4px;
+    /*border-bottom: 1px solid rgba(0,0,0, 0.5);*/
+    position: relative;
+    /*opacity: 0.7;*/
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+
+select {
+  max-width: 160px;
+/*   padding: 5px 35px 5px 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  -webkit-appearance: none;
+  appearance: none;
+  */
+}
+
+mark {
+    background-color: burlywood;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: -2px;
+    margin-right: -2px;
+    border-radius: 6px;
+}
+
+/*select > option * {
+    padding: 4px 8px;
+}*/
+
+
+/*select option {
+    border: 10px solid #000;
+    padding: 10px;
+    margin: 10px;
+}*/
+/*target Internet Explorer 9 and Internet Explorer 10:*/
+
+/*@media screen and (min-width: 0\0) {
+  select {
+    background: none;
+    padding: 5px;
+  }
+}*/
